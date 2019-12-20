@@ -1,4 +1,4 @@
-package net.corda.testing
+package com.dcm.contract
 
 import net.corda.core.contracts.CommandData
 import net.corda.core.contracts.Contract

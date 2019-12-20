@@ -1,6 +1,6 @@
-package com.template
+package com.dcm
 
-import com.template.flows.Responder
+import com.dcm.flows.Responder
 import net.corda.testing.node.MockNetwork
 import net.corda.testing.node.MockNetworkParameters
 import net.corda.testing.node.TestCordapp
