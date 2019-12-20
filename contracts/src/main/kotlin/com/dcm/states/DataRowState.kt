@@ -1,6 +1,6 @@
-package com.template.states
+package com.dcm.states
 
-import com.template.contracts.TemplateContract
+import com.dcm.contracts.TemplateContract
 import net.corda.core.contracts.BelongsToContract
 import net.corda.core.contracts.ContractState
 import net.corda.core.identity.AbstractParty
