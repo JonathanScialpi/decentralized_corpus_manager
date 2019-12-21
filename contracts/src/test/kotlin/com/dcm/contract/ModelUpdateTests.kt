@@ -38,8 +38,8 @@ class ModelUpdateTests {
                 val gatekeepers = listOf<Party>(ALICE.party, BOB.party)
                 val model = ModelState(myCorpus, gatekeepers)
                 input(ModelContract.MODEL_CONTRACT_ID, model)
-                output(ModelContract.MODEL_CONTRACT_ID,  model.removeGateKeepers(BOB.party))
-                command(model.participants.map { it.owningKey } + BOB.publicKey, ModelContract.Commands.AddGateKeepers())
+                output(ModelContract.MODEL_CONTRACT_ID,  model.addGateKeepers(BOB.party))
+                command(gatekeepers.map { it.owningKey }, ModelContract.Commands.AddGateKeepers())
                 this.failsWith("The inputState's gatekeeper list should have grown larger than that of the outputState's.")
             }
             transaction {

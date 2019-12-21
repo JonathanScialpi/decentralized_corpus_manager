@@ -5,6 +5,7 @@ import net.corda.core.contracts.BelongsToContract
 import net.corda.core.contracts.LinearState
 import net.corda.core.contracts.UniqueIdentifier
 import net.corda.core.identity.AbstractParty
+import java.util.*
 
 /*********
 @Dev: The DataRow State object represents the a comma delimited data string. Each
@@ -15,5 +16,9 @@ import net.corda.core.identity.AbstractParty
 *********/
 @BelongsToContract(DataRowContract::class)
 data class DataRowState(val dataRow: String,
+                        val parentModel : ModelState,
                         override val participants: List<AbstractParty> = listOf(),
-                        override val linearId: UniqueIdentifier = UniqueIdentifier()) : LinearState
+                        override val linearId: UniqueIdentifier = UniqueIdentifier()) : LinearState{
+ fun updateDataRow(newDataRow: String) = copy(dataRow =  newDataRow)
+ fun changeParentModel(newParentModel : ModelState) = copy(parentModel = newParentModel)
+}
