@@ -78,8 +78,30 @@ class DataRowTests {
           }
       }
     }
-//    @Test
-//    fun testingChangeParentModel(){
-//
-//    }
+    @Test
+    fun testingChangeParentModel(){
+        val gatekeepers = listOf<Party>(ALICE.party, BOB.party, CHARLIE.party)
+        val myCorpus = listOf<LinearState>()
+        val model = ModelState(myCorpus, gatekeepers)
+        val dr = DataRowState(
+                dataRow = "Help me change my password!",
+                parentModel = model
+        )
+        ledgerServices.ledger {
+            transaction {
+                val dr2 = dr.changeParentModel(model)
+                input(DataRowContract.DATAROW_CONTRACT_ID, dr)
+                output(DataRowContract.DATAROW_CONTRACT_ID, dr2)
+                command(model.participants.map { it.owningKey }, DataRowContract.Commands.ChangeParentModel())
+                this.failsWith("The proposed parent model state is the same as the original.")
+            }
+            transaction {
+                val dr2 = dr.changeParentModel(ModelState(myCorpus, gatekeepers.minus(BOB.party)))
+                input(DataRowContract.DATAROW_CONTRACT_ID, dr)
+                output(DataRowContract.DATAROW_CONTRACT_ID, dr2)
+                command(model.participants.map { it.owningKey }, DataRowContract.Commands.ChangeParentModel())
+                this.verifies()
+            }
+        }
+    }
 }

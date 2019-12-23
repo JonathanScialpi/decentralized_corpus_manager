@@ -31,16 +31,16 @@ class DataRowContract : Contract {
                 "Only one output state should be created when issuing a DataRow." using (tx.outputs.size == 1)
             }
             is Commands.UpdateDataRow -> requireThat {
-                "Only one input state should be consumed when updating a DataRow state." using (tx.inputs.size == 1)
-                "Only one output state should be created when updating a DataRow state." using (tx.outputs.size == 1)
                 val input = tx.inputsOfType<DataRowState>().single()
                 val output = tx.outputsOfType<DataRowState>().single()
                 "The proposed update is the same as the original value." using (input.dataRow != output.dataRow)
             }
             is Commands.ChangeParentModel -> requireThat {
+                "Only one input state should be consumed when updating a DataRow state." using (tx.inputs.size == 1)
+                "Only one output state should be created when updating a DataRow state." using (tx.outputs.size == 1)
                 val input = tx.inputsOfType<DataRowState>().single()
                 val output = tx.outputsOfType<DataRowState>().single()
-                "The proposed parent model state is the same as the original." using (input.parentModel == output.parentModel)
+                "The proposed parent model state is the same as the original." using (input.parentModel != output.parentModel)
             }
         }
     }
