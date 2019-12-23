@@ -132,13 +132,72 @@ class ModelUpdateTests {
 //            }
 //        }
 //    }
-//    @Test
-//    fun testAddDataRows(){
-//
-//    }
+    @Test
+    fun testAddDataRows(){
 
-//    @Test
-//    fun testRemoveDataRows(){
-//
-//    }
+        // Create model
+        val corpus = listOf<DataRowState>()
+        val gatekeepers = listOf<Party>(ALICE.party, BOB.party, CHARLIE.party)
+        val model = ModelState(corpus, gatekeepers)
+
+        //Create DataRow
+        val utterance = "Testing this out."
+        val dr = DataRowState(utterance, model)
+
+        ledgerServices.ledger {
+            transaction {
+                output(ModelContract.MODEL_CONTRACT_ID, model)
+                command(gatekeepers.map{it.owningKey}, ModelContract.Commands.Issue())
+                this.verifies()
+            }
+            transaction {
+                output(DataRowContract.DATAROW_CONTRACT_ID, dr)
+                command(gatekeepers.map{ it.owningKey }, DataRowContract.Commands.Issue())
+                this.verifies()
+            }
+            transaction {
+                val dataRowStates = listOf<DataRowState>(dr)
+                input(ModelContract.MODEL_CONTRACT_ID, model.addDataRows(dataRowStates))
+                command(gatekeepers.map { it.owningKey }, ModelContract.Commands.AddDataRows())
+                this.verifies()
+            }
+        }
+    }
+
+    @Test
+    fun testAddRemoveDataRows(){
+        // Create model
+        val corpus = listOf<DataRowState>()
+        val gatekeepers = listOf<Party>(ALICE.party, BOB.party, CHARLIE.party)
+        val model = ModelState(corpus, gatekeepers)
+
+        //Create DataRow
+        val utterance = "Testing this out."
+        val dr = DataRowState(utterance, model)
+
+        ledgerServices.ledger {
+            transaction {
+                output(ModelContract.MODEL_CONTRACT_ID, model)
+                command(gatekeepers.map{it.owningKey}, ModelContract.Commands.Issue())
+                this.verifies()
+            }
+            transaction {
+                output(DataRowContract.DATAROW_CONTRACT_ID, dr)
+                command(gatekeepers.map{ it.owningKey }, DataRowContract.Commands.Issue())
+                this.verifies()
+            }
+            transaction {
+                val dataRowStates = listOf<DataRowState>(dr)
+                input(ModelContract.MODEL_CONTRACT_ID, model.addDataRows(dataRowStates))
+                command(gatekeepers.map { it.owningKey }, ModelContract.Commands.AddDataRows())
+                this.verifies()
+            }
+            transaction {
+                val dataRowStates = listOf<DataRowState>(dr)
+                input(ModelContract.MODEL_CONTRACT_ID, model.removeDataRows(dataRowStates))
+                command(gatekeepers.map { it.owningKey }, ModelContract.Commands.RemoveDataRows())
+                this.verifies()
+            }
+        }
+    }
 }

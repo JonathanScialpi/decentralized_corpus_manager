@@ -10,12 +10,11 @@ import net.corda.testing.node.ledger
 import net.corda.training.ALICE
 import net.corda.training.BOB
 import net.corda.training.CHARLIE
-import org.apache.activemq.artemis.utils.DataConstants
 import org.junit.Test
 
 class DataRowTests {
     private val ledgerServices = MockServices()
-    class DummyCommand : TypeOnlyCommandData()
+    //class DummyCommand : TypeOnlyCommandData()
 
     /**
      * This Test checks the following while using the [DataRowContract.Commands.Issue] command:
