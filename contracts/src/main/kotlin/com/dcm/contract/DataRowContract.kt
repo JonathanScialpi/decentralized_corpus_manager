@@ -27,15 +27,15 @@ class DataRowContract : Contract {
         val command = tx.commands.requireSingleCommand<DataRowContract.Commands>()
         when (command.value) {
             is Commands.Issue -> requireThat {
-                "No inputs should be consumed when issuing a Model." using (tx.inputs.isEmpty())
-                "Only one output state should be created when issuing a Model." using (tx.outputs.size == 1)
-                val output = tx.outputsOfType<DataRowState>().single()
-                "The DataRow must pointt to its respective ModelState." using (output.parentModel == null)
+                "No inputs should be consumed when issuing a DataRow." using (tx.inputs.isEmpty())
+                "Only one output state should be created when issuing a DataRow." using (tx.outputs.size == 1)
             }
             is Commands.UpdateDataRow -> requireThat {
+                "Only one input state should be consumed when updating a DataRow state." using (tx.inputs.size == 1)
+                "Only one output state should be created when updating a DataRow state." using (tx.outputs.size == 1)
                 val input = tx.inputsOfType<DataRowState>().single()
                 val output = tx.outputsOfType<DataRowState>().single()
-                "The proposed update is the same as the original value." using (input.dataRow == output.dataRow)
+                "The proposed update is the same as the original value." using (input.dataRow != output.dataRow)
             }
             is Commands.ChangeParentModel -> requireThat {
                 val input = tx.inputsOfType<DataRowState>().single()
