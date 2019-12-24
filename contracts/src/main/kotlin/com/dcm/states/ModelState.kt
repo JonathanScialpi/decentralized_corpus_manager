@@ -31,7 +31,7 @@ data class ModelState(val corpus: List<LinearState>,
     fun removeDataRows(dataRowsToRemove: List<DataRowState>) : ModelState{
         var newDataRowMap = LinkedHashMap(dataRowMap)
         dataRowsToRemove.map{newDataRowMap.remove(it.dataRow, it)}
-        return copy(corpus = corpus.minus(dataRowsToRemove), dataRowMap = newDataRowMap)
+        return copy(corpus = corpus.minus(dataRowsToRemove).distinct(), dataRowMap = newDataRowMap)
     }
     fun addGateKeepers(gateKeepersToAdd: Party) = copy(participants = participants.plus(gateKeepersToAdd).distinct())
     fun removeGateKeepers(gateKeepersToRemove: Party) = copy(participants = participants.minus(gateKeepersToRemove))

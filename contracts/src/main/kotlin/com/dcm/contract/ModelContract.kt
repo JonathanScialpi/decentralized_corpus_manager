@@ -47,11 +47,19 @@ class ModelContract: Contract {
             }
 
             is Commands.AddDataRows -> requireThat {
-
+                "Only one input state should be consumed when adding a new DataRow to a model." using (tx.inputs.size == 1)
+                "Only one output state should be created when adding a new DataRow to a model." using (tx.outputs.size == 1)
+                val input = tx.inputsOfType<ModelState>().single()
+                val output = tx.outputsOfType<ModelState>().single()
+                "List of DataRows to add cannot be empty." using (input.dataRowMap != output.dataRowMap)
             }
 
             is Commands.RemoveDataRows -> requireThat {
-
+                "Only one input state should be consumed when removing a DataRow from a model." using (tx.inputs.size == 1)
+                "Only one output state should be created when removing a DataRow from a model." using (tx.outputs.size == 1)
+                val input = tx.inputsOfType<ModelState>().single()
+                val output = tx.outputsOfType<ModelState>().single()
+                "List of DataRows to add cannot be empty." using (input.dataRowMap != output.dataRowMap)
             }
         }
     }

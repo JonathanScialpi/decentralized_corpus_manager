@@ -133,18 +133,9 @@ class ModelUpdateTests {
 
         ledgerServices.ledger {
             transaction {
-                output(ModelContract.MODEL_CONTRACT_ID, model)
-                command(gatekeepers.map{it.owningKey}, ModelContract.Commands.Issue())
-                this.verifies()
-            }
-            transaction {
-                output(DataRowContract.DATAROW_CONTRACT_ID, dr)
-                command(gatekeepers.map{ it.owningKey }, DataRowContract.Commands.Issue())
-                this.verifies()
-            }
-            transaction {
                 val dataRowStates = listOf<DataRowState>(dr)
-                input(ModelContract.MODEL_CONTRACT_ID, model.addDataRows(dataRowStates))
+                input(ModelContract.MODEL_CONTRACT_ID, model)
+                output(ModelContract.MODEL_CONTRACT_ID, model.addDataRows(dataRowStates))
                 command(gatekeepers.map { it.owningKey }, ModelContract.Commands.AddDataRows())
                 this.verifies()
             }
@@ -165,24 +156,9 @@ class ModelUpdateTests {
 
         ledgerServices.ledger {
             transaction {
-                output(ModelContract.MODEL_CONTRACT_ID, model)
-                command(gatekeepers.map{it.owningKey}, ModelContract.Commands.Issue())
-                this.verifies()
-            }
-            transaction {
-                output(DataRowContract.DATAROW_CONTRACT_ID, dr)
-                command(gatekeepers.map{ it.owningKey }, DataRowContract.Commands.Issue())
-                this.verifies()
-            }
-            transaction {
                 val dataRowStates = listOf<DataRowState>(dr)
                 input(ModelContract.MODEL_CONTRACT_ID, model.addDataRows(dataRowStates))
-                command(gatekeepers.map { it.owningKey }, ModelContract.Commands.AddDataRows())
-                this.verifies()
-            }
-            transaction {
-                val dataRowStates = listOf<DataRowState>(dr)
-                input(ModelContract.MODEL_CONTRACT_ID, model.removeDataRows(dataRowStates))
+                output(ModelContract.MODEL_CONTRACT_ID, model.removeDataRows(dataRowStates))
                 command(gatekeepers.map { it.owningKey }, ModelContract.Commands.RemoveDataRows())
                 this.verifies()
             }
