@@ -35,8 +35,9 @@ class ModelUpdateTests {
         ledgerServices.ledger {
             transaction {
                 val myCorpus = listOf<LinearState>()
+                val dataRowMap = LinkedHashMap<String, DataRowState>()
                 val gatekeepers = listOf<Party>(ALICE.party, BOB.party)
-                val model = ModelState(myCorpus, gatekeepers)
+                val model = ModelState(myCorpus, dataRowMap, gatekeepers)
                 input(ModelContract.MODEL_CONTRACT_ID, model)
                 output(ModelContract.MODEL_CONTRACT_ID,  model.addGateKeepers(BOB.party))
                 command(gatekeepers.map { it.owningKey }, ModelContract.Commands.AddGateKeepers())
@@ -45,7 +46,8 @@ class ModelUpdateTests {
             transaction {
                 val myCorpus = listOf<LinearState>()
                 val gatekeepers = listOf<Party>(ALICE.party)
-                val model = ModelState(myCorpus, gatekeepers)
+                val dataRowMap = LinkedHashMap<String, DataRowState>()
+                val model = ModelState(myCorpus, dataRowMap, gatekeepers)
                 input(ModelContract.MODEL_CONTRACT_ID, model)
                 output(ModelContract.MODEL_CONTRACT_ID,  model.addGateKeepers(BOB.party))
                 command(model.participants.map { it.owningKey }, ModelContract.Commands.AddGateKeepers())
@@ -54,7 +56,8 @@ class ModelUpdateTests {
             transaction {
                 val myCorpus = listOf<LinearState>()
                 val gatekeepers = listOf<Party>(ALICE.party)
-                val model = ModelState(myCorpus, gatekeepers)
+                val dataRowMap = LinkedHashMap<String, DataRowState>()
+                val model = ModelState(myCorpus, dataRowMap, gatekeepers)
                 input(ModelContract.MODEL_CONTRACT_ID, model)
                 output(ModelContract.MODEL_CONTRACT_ID,  model.addGateKeepers(BOB.party))
                 command(model.participants.map{it.owningKey} + BOB.publicKey, ModelContract.Commands.AddGateKeepers())
@@ -75,7 +78,8 @@ class ModelUpdateTests {
             transaction {
                 val myCorpus = listOf<LinearState>()
                 val gatekeepers = listOf<Party>(ALICE.party)
-                val model = ModelState(myCorpus, gatekeepers)
+                val dataRowMap = LinkedHashMap<String, DataRowState>()
+                val model = ModelState(myCorpus, dataRowMap, gatekeepers)
                 input(ModelContract.MODEL_CONTRACT_ID, model)
                 output(ModelContract.MODEL_CONTRACT_ID, model)
                 command(model.participants.map { it.owningKey }, ModelContract.Commands.RemoveGateKeepers())
@@ -84,7 +88,8 @@ class ModelUpdateTests {
             transaction {
                 val myCorpus = listOf<LinearState>()
                 val gatekeepers = listOf<Party>(ALICE.party, BOB.party)
-                val model = ModelState(myCorpus, gatekeepers)
+                val dataRowMap = LinkedHashMap<String, DataRowState>()
+                val model = ModelState(myCorpus, dataRowMap, gatekeepers)
                 input(ModelContract.MODEL_CONTRACT_ID, model)
                 output(ModelContract.MODEL_CONTRACT_ID, model.removeGateKeepers(BOB.party))
                 command(model.participants.minus(BOB.party).map { it.owningKey }, ModelContract.Commands.RemoveGateKeepers())
@@ -93,7 +98,8 @@ class ModelUpdateTests {
             transaction {
                 val myCorpus = listOf<LinearState>()
                 val gatekeepers = listOf<Party>(ALICE.party)
-                val model = ModelState(myCorpus, gatekeepers)
+                val dataRowMap = LinkedHashMap<String, DataRowState>()
+                val model = ModelState(myCorpus, dataRowMap, gatekeepers)
                 input(ModelContract.MODEL_CONTRACT_ID, model)
                 output(ModelContract.MODEL_CONTRACT_ID, model.removeGateKeepers(ALICE.party))
                 command(gatekeepers.map { it.owningKey }, ModelContract.Commands.RemoveGateKeepers())
@@ -102,7 +108,8 @@ class ModelUpdateTests {
             transaction {
                 val myCorpus = listOf<LinearState>()
                 val gatekeepers = listOf<Party>(ALICE.party, BOB.party)
-                val model = ModelState(myCorpus, gatekeepers)
+                val dataRowMap = LinkedHashMap<String, DataRowState>()
+                val model = ModelState(myCorpus, dataRowMap, gatekeepers)
                 input(ModelContract.MODEL_CONTRACT_ID, model)
                 output(ModelContract.MODEL_CONTRACT_ID, model.removeGateKeepers(BOB.party))
                 command(model.participants.map { it.owningKey }, ModelContract.Commands.RemoveGateKeepers())
@@ -110,35 +117,15 @@ class ModelUpdateTests {
             }
         }
     }
-//    @Test
-//    fun testAddRemoveCombined() {
-//        ledgerServices.ledger {
-//            val myCorpus = listOf<DataRowState>()
-//            val gateKeepers = listOf<Party>(ALICE.party, BOB.party, CHARLIE.party)
-//            val model = ModelState(myCorpus, gateKeepers)
-//            transaction {
-//                output(ModelContract.MODEL_CONTRACT_ID, model)
-//                command(gateKeepers.map { it.owningKey }, ModelContract.Commands.Issue())
-//
-//                input(ModelContract.MODEL_CONTRACT_ID, model)
-//                val removeAliceState = model.removeGateKeepers(ALICE.party)
-//                output(ModelContract.MODEL_CONTRACT_ID, removeAliceState)
-//                command(gateKeepers.map { it.owningKey }, ModelContract.Commands.RemoveGateKeepers())
-//
-//                input(ModelContract.MODEL_CONTRACT_ID, removeAliceState)
-//                output(ModelContract.MODEL_CONTRACT_ID, removeAliceState.addGateKeepers(MINICORP.party))
-//                command(removeAliceState.participants.map { it.owningKey }.plus(MINICORP.publicKey), ModelContract.Commands.AddGateKeepers())
-//                this.verifies()
-//            }
-//        }
-//    }
+    
     @Test
     fun testAddDataRows(){
 
         // Create model
         val corpus = listOf<DataRowState>()
         val gatekeepers = listOf<Party>(ALICE.party, BOB.party, CHARLIE.party)
-        val model = ModelState(corpus, gatekeepers)
+        val dataRowMap = LinkedHashMap<String, DataRowState>()
+        val model = ModelState(corpus, dataRowMap, gatekeepers)
 
         //Create DataRow
         val utterance = "Testing this out."
@@ -169,7 +156,8 @@ class ModelUpdateTests {
         // Create model
         val corpus = listOf<DataRowState>()
         val gatekeepers = listOf<Party>(ALICE.party, BOB.party, CHARLIE.party)
-        val model = ModelState(corpus, gatekeepers)
+        val dataRowMap = LinkedHashMap<String, DataRowState>()
+        val model = ModelState(corpus, dataRowMap, gatekeepers)
 
         //Create DataRow
         val utterance = "Testing this out."

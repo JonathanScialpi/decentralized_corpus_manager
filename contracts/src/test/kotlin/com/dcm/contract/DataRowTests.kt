@@ -27,7 +27,8 @@ class DataRowTests {
     fun dataRowIssueTesting() {
         val gatekeepers = listOf<Party>(ALICE.party, BOB.party, CHARLIE.party)
         val myCorpus = listOf<LinearState>()
-        val model = ModelState(myCorpus, gatekeepers)
+        val dataRowMap = LinkedHashMap<String, DataRowState>()
+        val model = ModelState(myCorpus, dataRowMap, gatekeepers)
         val dr = DataRowState(
                 dataRow = "Help me change my password!",
                 parentModel = model
@@ -55,7 +56,8 @@ class DataRowTests {
     fun testingUpdateDataRow(){
         val gatekeepers = listOf<Party>(ALICE.party, BOB.party, CHARLIE.party)
         val myCorpus = listOf<LinearState>()
-        val model = ModelState(myCorpus, gatekeepers)
+        val dataRowMap = LinkedHashMap<String, DataRowState>()
+        val model = ModelState(myCorpus, dataRowMap, gatekeepers)
         val dr = DataRowState(
                 dataRow = "Help me change my password!",
                 parentModel = model
@@ -81,7 +83,8 @@ class DataRowTests {
     fun testingChangeParentModel(){
         val gatekeepers = listOf<Party>(ALICE.party, BOB.party, CHARLIE.party)
         val myCorpus = listOf<LinearState>()
-        val model = ModelState(myCorpus, gatekeepers)
+        val dataRowMap = LinkedHashMap<String, DataRowState>()
+        val model = ModelState(myCorpus, dataRowMap, gatekeepers)
         val dr = DataRowState(
                 dataRow = "Help me change my password!",
                 parentModel = model
@@ -95,7 +98,7 @@ class DataRowTests {
                 this.failsWith("The proposed parent model state is the same as the original.")
             }
             transaction {
-                val dr2 = dr.changeParentModel(ModelState(myCorpus, gatekeepers.minus(BOB.party)))
+                val dr2 = dr.changeParentModel(ModelState(myCorpus, dataRowMap, gatekeepers.minus(BOB.party)))
                 input(DataRowContract.DATAROW_CONTRACT_ID, dr)
                 output(DataRowContract.DATAROW_CONTRACT_ID, dr2)
                 command(model.participants.map { it.owningKey }, DataRowContract.Commands.ChangeParentModel())

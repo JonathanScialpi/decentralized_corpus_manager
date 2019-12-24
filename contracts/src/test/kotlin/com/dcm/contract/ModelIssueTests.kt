@@ -1,5 +1,6 @@
 package com.dcm.contract
 
+import com.dcm.states.DataRowState
 import com.dcm.states.ModelState
 import net.corda.core.contracts.LinearState
 import net.corda.core.contracts.TypeOnlyCommandData
@@ -26,7 +27,8 @@ class ModelIssueTests {
     fun mustIncludeIssueCommand() {
         val gatekeepers = listOf<Party>(ALICE.party, BOB.party, CHARLIE.party)
         val myCorpus = listOf<LinearState>()
-        val model = ModelState(myCorpus, gatekeepers)
+        val dataRowMap = LinkedHashMap<String, DataRowState>()
+        val model = ModelState(myCorpus, dataRowMap, gatekeepers)
 
         ledgerServices.ledger {
             // #1
@@ -47,7 +49,7 @@ class ModelIssueTests {
 
             // #3
             transaction {
-                output(ModelContract.MODEL_CONTRACT_ID, ModelState(myCorpus, listOf<Party>()))
+                output(ModelContract.MODEL_CONTRACT_ID, ModelState(myCorpus, dataRowMap, listOf<Party>()))
                 command(gatekeepers.map{it.owningKey}, ModelContract.Commands.Issue())
                 this.failsWith("The participants of a model must have at least one party.")
             }
