@@ -3,34 +3,39 @@ package com.dcm.flows
 import co.paralleluniverse.fibers.Suspendable
 import com.dcm.contract.ModelContract
 import com.dcm.states.ModelState
-import net.corda.core.contracts.Command
-import net.corda.core.contracts.StateAndContract
-import net.corda.core.contracts.requireThat
+import net.corda.core.contracts.*
 import net.corda.core.flows.*
+import net.corda.core.node.services.queryBy
+import net.corda.core.node.services.vault.QueryCriteria
 import net.corda.core.transactions.SignedTransaction
 import net.corda.core.transactions.TransactionBuilder
 
 @InitiatingFlow
 @StartableByRPC
-class ModelIssueFlow(val state: ModelState): FlowLogic<SignedTransaction>() {
+class ModelAddGateKeeperFlow(val inputStateLinearId: UniqueIdentifier,
+                             val outputState: ModelState): FlowLogic<SignedTransaction>(){
     @Suspendable
-    override fun call(): SignedTransaction{
+    override fun call(): SignedTransaction {
         val notary = serviceHub.networkMapCache.notaryIdentities.first()
-        val issueCommand = Command(ModelContract.Commands.Issue(), state.participants.map { it.owningKey })
-        val outputStateAndContract = StateAndContract(state, ModelContract.MODEL_CONTRACT_ID)
+        val addGateKeeperCommand = Command(ModelContract.Commands.AddGateKeepers(), outputState.participants.map { it.owningKey })
+        val queryCriteria = QueryCriteria.LinearStateQueryCriteria(linearId = listOf(inputStateLinearId))
+        val modelInputStateRef =  serviceHub.vaultService.queryBy<ModelState>(queryCriteria).states.single()
+        val outputStateAndContract = StateAndContract(outputState, ModelContract.MODEL_CONTRACT_ID)
         val txBuilder = TransactionBuilder(notary = notary).withItems(
+                modelInputStateRef,
                 outputStateAndContract,
-                issueCommand)
+                addGateKeeperCommand
+        )
         txBuilder.verify(serviceHub)
         val ptx = serviceHub.signInitialTransaction(txBuilder)
-        val sessions = (state.participants - ourIdentity).map { initiateFlow(it) }.toSet()
+        val sessions = (outputState.participants - ourIdentity).map { initiateFlow(it) }.toSet()
         val stx = subFlow(CollectSignaturesFlow(ptx, sessions))
         return subFlow(FinalityFlow(stx, sessions))
     }
 }
 
-@InitiatedBy(ModelIssueFlow::class)
-class ModelIssueFlowResponder(val flowSession: FlowSession): FlowLogic<SignedTransaction>() {
+@InitiatedBy(ModelAddGateKeeperFlow::class)
+class ModelAddGateKeeperResponderFlow(val flowSession: FlowSession): FlowLogic<SignedTransaction>() {
 
     @Suspendable
     override fun call(): SignedTransaction {
