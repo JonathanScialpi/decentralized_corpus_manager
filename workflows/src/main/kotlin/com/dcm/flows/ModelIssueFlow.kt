@@ -12,7 +12,7 @@ import net.corda.core.transactions.TransactionBuilder
 
 @InitiatingFlow
 @StartableByRPC
-class ModelIssueFlow(val state: ModelState): FlowLogic<SignedTransaction>() {
+class ModelIssueFlow(private val state: ModelState): FlowLogic<SignedTransaction>() {
     @Suspendable
     override fun call(): SignedTransaction{
         val notary = serviceHub.networkMapCache.notaryIdentities.first()

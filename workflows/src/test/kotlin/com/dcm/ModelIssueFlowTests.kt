@@ -19,7 +19,7 @@ import org.junit.*
 import kotlin.test.assertFailsWith
 
 /**
- These tests rely on Quasar to be loaded, set your run configuration to "-ea -javaagent:lib/quasar.jar"
+These tests rely on Quasar to be loaded, set your run configuration to "-ea -javaagent:lib/quasar.jar"
  * Run configuration can be edited in IntelliJ under Run -> Edit Configurations -> VM options
  * On some machines/configurations you may have to provide a full path to the quasar.jar file.
  * On some machines/configurations you may have to use the "JAR manifest" option for shortening the command line.
