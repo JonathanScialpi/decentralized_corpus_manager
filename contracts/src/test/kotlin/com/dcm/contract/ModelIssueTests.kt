@@ -40,12 +40,16 @@ class ModelIssueTests {
             }
 
             // #2
-//            transaction {
-//                output(ModelContract.MODEL_CONTRACT_ID,  model)
-//                output(ModelContract.MODEL_CONTRACT_ID, model2)
-//                command(gatekeepers.map{it.owningKey}, ModelContract.Commands.Issue())
-//                this.failsWith("Only one output state should be created when issuing a Model.")
-//            }
+            transaction {
+                val gatekeepers = listOf<Party>(ALICE.party, BOB.party, CHARLIE.party)
+                val myCorpus = listOf<LinearState>()
+                val dataRowMap = LinkedHashMap<String, DataRowState>()
+                val model2 = ModelState(myCorpus, dataRowMap, gatekeepers)
+                output(ModelContract.MODEL_CONTRACT_ID,  model)
+                output(ModelContract.MODEL_CONTRACT_ID, model2)
+                command(gatekeepers.map{it.owningKey}, ModelContract.Commands.Issue())
+                this.failsWith("Only one output state should be created when issuing a Model.")
+            }
 
             // #3
             transaction {

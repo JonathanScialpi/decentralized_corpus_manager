@@ -12,19 +12,30 @@ import net.corda.core.transactions.TransactionBuilder
 
 @InitiatingFlow
 @StartableByRPC
-class ModelAddGateKeeperFlow(val inputStateLinearId: UniqueIdentifier,
-                             val outputState: ModelState): FlowLogic<SignedTransaction>(){
+class ModelUpdateGateKeeperFlow(private val inputStateLinearId: UniqueIdentifier,
+                                private val outputState: ModelState,
+                                private val addingGateKeeper: Boolean
+                                ): FlowLogic<SignedTransaction>(){
     @Suspendable
     override fun call(): SignedTransaction {
         val notary = serviceHub.networkMapCache.notaryIdentities.first()
-        val addGateKeeperCommand = Command(ModelContract.Commands.AddGateKeepers(), outputState.participants.map { it.owningKey })
         val queryCriteria = QueryCriteria.LinearStateQueryCriteria(linearId = listOf(inputStateLinearId))
         val modelInputStateRef =  serviceHub.vaultService.queryBy<ModelState>(queryCriteria).states.single()
+
+        //make sure that the party running this flow is already a gatekeeper
+        if(ourIdentity !in modelInputStateRef.state.data.participants){
+            throw IllegalArgumentException("The initiator of this flow must be a gatekeeper.")
+        }
         val outputStateAndContract = StateAndContract(outputState, ModelContract.MODEL_CONTRACT_ID)
+        var gatekeeperCommand = if(addingGateKeeper){
+            Command(ModelContract.Commands.AddGateKeepers(), outputState.participants.map { it.owningKey })
+        }else{
+            Command(ModelContract.Commands.RemoveGateKeepers(), outputState.participants.map { it.owningKey })
+        }
         val txBuilder = TransactionBuilder(notary = notary).withItems(
                 modelInputStateRef,
                 outputStateAndContract,
-                addGateKeeperCommand
+                gatekeeperCommand
         )
         txBuilder.verify(serviceHub)
         val ptx = serviceHub.signInitialTransaction(txBuilder)
@@ -34,7 +45,7 @@ class ModelAddGateKeeperFlow(val inputStateLinearId: UniqueIdentifier,
     }
 }
 
-@InitiatedBy(ModelAddGateKeeperFlow::class)
+@InitiatedBy(ModelUpdateGateKeeperFlow::class)
 class ModelAddGateKeeperResponderFlow(val flowSession: FlowSession): FlowLogic<SignedTransaction>() {
 
     @Suspendable
