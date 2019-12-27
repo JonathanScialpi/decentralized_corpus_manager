@@ -20,6 +20,7 @@ import net.corda.testing.node.StartedMockNode
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
+import kotlin.test.assertFailsWith
 
 /**
 These tests rely on Quasar to be loaded, set your run configuration to "-ea -javaagent:lib/quasar.jar"
@@ -71,7 +72,7 @@ class ModelUpdateGatekeeperFlowTests {
     fun flowReturnsCorrectlyFormedPartiallySignedTransaction(){
         val corpus = listOf<DataRowState>()
         val dataRowMap = LinkedHashMap<String, DataRowState>()
-        val gatekeepers = listOf<Party>(a.info.chooseIdentityAndCert().party)
+        val gatekeepers = listOf<Party>(a.info.chooseIdentityAndCert().party, c.info.chooseIdentityAndCert().party)
         val stx = issueModel(ModelState(corpus, dataRowMap, gatekeepers))
         val inputModel = stx.tx.outputs.single().data as ModelState
         val flow = ModelUpdateGateKeeperFlow(inputModel.linearId, b.info.chooseIdentityAndCert().party, true)
@@ -92,5 +93,25 @@ class ModelUpdateGatekeeperFlowTests {
                 mockNetwork.defaultNotaryNode.info.legalIdentitiesAndCerts.first().owningKey)
     }
 
+    /**
+     * Make sure that the [ModelUpdateGateKeeperFlow] can only be run by the
+     * model's current gatekeepers.
+     * Although nodeA was able to create the model, because he is not a participant/gatekeeper,
+     * he is unable to find the proposed inputState's linearID. Therefore, it might not
+     * be necessary to check for the identity in the participant list in the flow.
+     */
+
+    @Test
+    fun flowCanOnlyBeRunByGatekeepers(){
+        val corpus = listOf<DataRowState>()
+        val dataRowMap = LinkedHashMap<String, DataRowState>()
+        val gatekeepers = listOf<Party>(c.info.chooseIdentityAndCert().party)
+        val stx = issueModel(ModelState(corpus, dataRowMap, gatekeepers))
+        val inputModel = stx.tx.outputs.single().data as ModelState
+        val flow = ModelUpdateGateKeeperFlow(inputModel.linearId, b.info.chooseIdentityAndCert().party, true)
+        val future = a.startFlow(flow)
+        mockNetwork.runNetwork()
+        assertFailsWith<NoSuchElementException> { future.getOrThrow() }
+    }
 }
 
