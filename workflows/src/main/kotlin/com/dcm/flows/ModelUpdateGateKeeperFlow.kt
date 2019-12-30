@@ -24,9 +24,14 @@ class ModelUpdateGateKeeperFlow(private val inputStateLinearId: UniqueIdentifier
         val modelInputStateRef =  serviceHub.vaultService.queryBy<ModelState>(queryCriteria).states.single()
         val inputState : ModelState = modelInputStateRef.state.data
 
-        //make sure that the party running this flow is already a gatekeeper
-        // THIS CHECK MIGHT NOT BE NECESSARY since only gatekeepers will have
-        // access to the proposed model's linearID
+        /**
+         * Make sure that the party running this flow is already a gatekeeper
+         * Although this check seems unnecessary since the proposer won't have
+         * access to the inputState of model that they are not a participant of,
+         * it is still needed if that user is added and later removed since we
+         * are using LinearStates.
+        */
+
         if(ourIdentity !in inputState.participants){
             throw IllegalArgumentException("The initiator of this flow must be a gatekeeper.")
         }
