@@ -8,6 +8,7 @@ import com.dcm.flows.ModelUpdateGateKeeperFlow
 import com.dcm.states.DataRowState
 import com.dcm.states.ModelState
 import net.corda.core.contracts.StateRef
+import net.corda.core.contracts.TransactionVerificationException
 import net.corda.core.identity.CordaX500Name
 import net.corda.core.identity.Party
 import net.corda.core.transactions.SignedTransaction
@@ -94,24 +95,33 @@ class ModelUpdateGatekeeperFlowTests {
     }
 
     /**
-     * Make sure that the [ModelUpdateGateKeeperFlow] can only be run by the
-     * model's current gatekeepers.
-     * Although nodeA was able to create the model, because he is not a participant/gatekeeper,
-     * he is unable to find the proposed inputState's linearID. Therefore, it might not
-     * be necessary to check for the identity in the participant list in the flow.
-     */
-
+     * Just because the intiator was a gatekeeper in the past doesn't necessarily mean they are are currently a gatekeeper
+     * and therefore should be blocked from committing any gatekeeper transactions.
+     * */
     @Test
-    fun flowCanOnlyBeRunByGatekeepers(){
+    fun flowCanOnlyBeRunByCurrentGatekeepers(){
         val corpus = listOf<DataRowState>()
         val dataRowMap = LinkedHashMap<String, DataRowState>()
-        val gatekeepers = listOf<Party>(c.info.chooseIdentityAndCert().party)
+        val gatekeepers = listOf<Party>(a.info.chooseIdentityAndCert().party, c.info.chooseIdentityAndCert().party)
         val stx = issueModel(ModelState(corpus, dataRowMap, gatekeepers))
         val inputModel = stx.tx.outputs.single().data as ModelState
         val flow = ModelUpdateGateKeeperFlow(inputModel.linearId, b.info.chooseIdentityAndCert().party, true)
         val future = a.startFlow(flow)
         mockNetwork.runNetwork()
-        assertFailsWith<NoSuchElementException> { future.getOrThrow() }
+
+        val inputModel2 = future.getOrThrow().tx.outputs.single().data as ModelState
+        val removeFlow = ModelUpdateGateKeeperFlow(inputModel2.linearId, a.info.chooseIdentityAndCert().party, false)
+        val removeFuture = a.startFlow(removeFlow)
+        mockNetwork.runNetwork()
+
+        val newInputModel = future.getOrThrow().tx.outputs.single().data as ModelState
+        val addFlow = ModelUpdateGateKeeperFlow(newInputModel.linearId, a.info.chooseIdentityAndCert().party, true)
+        val addFuture = a.startFlow(addFlow)
+        mockNetwork.runNetwork()
+
+        assertFailsWith<TransactionVerificationException> { addFuture.getOrThrow() }
     }
+
 }
+
 
