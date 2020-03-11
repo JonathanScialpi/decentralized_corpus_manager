@@ -1,7 +1,6 @@
 package com.dcm.contract
 
 import com.dcm.states.ModelState
-import com.dcm.states.DataRowState
 import net.corda.core.contracts.LinearState
 import net.corda.core.identity.Party
 import net.corda.testing.node.MockServices
@@ -9,9 +8,7 @@ import net.corda.testing.node.ledger
 import net.corda.training.ALICE
 import net.corda.training.BOB
 import net.corda.training.CHARLIE
-import net.corda.training.MINICORP
 import org.junit.Test
-import java.security.PublicKey
 
 class ModelUpdateTests {
     private val ledgerServices = MockServices()

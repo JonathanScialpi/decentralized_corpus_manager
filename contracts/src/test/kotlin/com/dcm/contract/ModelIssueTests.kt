@@ -1,6 +1,5 @@
 package com.dcm.contract
 
-import com.dcm.states.DataRowState
 import com.dcm.states.ModelState
 import net.corda.core.contracts.LinearState
 import net.corda.core.contracts.TypeOnlyCommandData

@@ -1,22 +1,23 @@
 package com.dcm
+import com.dcm.contract.ModelContract
 import com.dcm.flows.ModelIssueFlow
+import com.dcm.flows.ModelIssueFlowResponder
+import com.dcm.states.ModelState
+import groovy.util.GroovyTestCase.assertEquals
 import net.corda.core.contracts.Command
 import net.corda.core.flows.FlowLogic
 import net.corda.core.identity.CordaX500Name
+import net.corda.core.identity.Party
 import net.corda.core.transactions.SignedTransaction
 import net.corda.core.utilities.getOrThrow
-import net.corda.core.identity.Party
 import net.corda.testing.internal.chooseIdentityAndCert
-import net.corda.testing.node.*
-import com.dcm.contract.ModelContract
-import com.dcm.flows.ModelIssueFlowResponder
-import com.dcm.states.DataRowState
-import com.dcm.states.ModelState
-import groovy.util.GroovyTestCase.assertEquals
-import net.corda.core.contracts.LinearState
-import net.corda.core.contracts.TransactionVerificationException
-import org.junit.*
-import kotlin.test.assertFailsWith
+import net.corda.testing.node.MockNetwork
+import net.corda.testing.node.MockNetworkNotarySpec
+import net.corda.testing.node.MockNodeParameters
+import net.corda.testing.node.StartedMockNode
+import org.junit.After
+import org.junit.Before
+import org.junit.Test
 
 /**
 These tests rely on Quasar to be loaded, set your run configuration to "-ea -javaagent:lib/quasar.jar"

@@ -17,22 +17,21 @@ import kotlin.collections.LinkedHashMap
 @param modelID A unique identifier for reference.
  *********/
 @BelongsToContract(ModelContract::class)
-data class ModelState(val corpus: List<LinearState>,
-                      val dataRowMap : LinkedHashMap<String, DataRowState>,
-                      override val participants: List<Party>,
-                      override val linearId: UniqueIdentifier = UniqueIdentifier()) : LinearState{
+data class ModelState(
+        val corpus: LinkedHashMap<String, String>,
+        val labelsAndScoreMap: LinkedHashMap<String, LinkedHashMap<String, Double>>,
+        override val participants: List<Party>,
+        override val linearId: UniqueIdentifier = UniqueIdentifier()) : LinearState{
 
-    fun addDataRows(dataRowsToAdd: List<DataRowState>) : ModelState{
-        val newDataRowMap = LinkedHashMap(dataRowMap)
-        dataRowsToAdd.map{newDataRowMap.put(it.dataRow, it)}
-        return copy(corpus = corpus.plus(dataRowsToAdd).distinct(), dataRowMap = newDataRowMap)
+    fun addDataRows(dataRowsToAdd: LinkedHashMap<String, String>) : ModelState{
+        val newCorpus = LinkedHashMap(corpus)
+        dataRowsToAdd.map{newCorpus.put(it.key, it.value)}
+        return copy(corpus = newCorpus)
     }
 
-    fun removeDataRows(dataRowsToRemove: List<DataRowState>) : ModelState{
-        var newDataRowMap = LinkedHashMap(dataRowMap)
-        dataRowsToRemove.map{newDataRowMap.remove(it.dataRow, it)}
-        return copy(corpus = corpus.minus(dataRowsToRemove).distinct(), dataRowMap = newDataRowMap)
+    fun removeDataRows(dataRowsToRemove: LinkedHashMap<String, String>) : ModelState{
+        val newCorpus = LinkedHashMap(corpus)
+        dataRowsToRemove.map{newCorpus.remove(it.key)}
+        return copy(corpus = newCorpus)
     }
-    fun addGateKeepers(gateKeepersToAdd: Party) = copy(participants = participants.plus(gateKeepersToAdd).distinct())
-    fun removeGateKeepers(gateKeepersToRemove: Party) = copy(participants = participants.minus(gateKeepersToRemove))
 }
