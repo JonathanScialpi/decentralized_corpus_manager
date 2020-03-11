@@ -1,7 +1,7 @@
 package com.dcm
-import com.dcm.contract.ModelContract
+import com.dcm.flows.DataRowIssueFlow
+import com.dcm.flows.DataRowIssueFlowResponder
 import com.dcm.flows.ModelIssueFlow
-import com.dcm.flows.ModelIssueFlowResponder
 import com.dcm.states.ModelState
 import groovy.util.GroovyTestCase.assertEquals
 import net.corda.core.contracts.Command
@@ -19,13 +19,7 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 
-/**
-These tests rely on Quasar to be loaded, set your run configuration to "-ea -javaagent:lib/quasar.jar"
- * Run configuration can be edited in IntelliJ under Run -> Edit Configurations -> VM options
- * On some machines/configurations you may have to provide a full path to the quasar.jar file.
- * On some machines/configurations you may have to use the "JAR manifest" option for shortening the command line.
- */
-class ModelIssueFlowTests {
+class DataRowIssueFlowTests {
     lateinit var mockNetwork: MockNetwork
     lateinit var a: StartedMockNode
     lateinit var b: StartedMockNode
@@ -44,7 +38,7 @@ class ModelIssueFlowTests {
         d = mockNetwork.createNode(MockNodeParameters())
         val startedNodes = arrayListOf(a, b, c, d)
         // For real nodes this happens automatically, but we have to manually register the flow for tests
-        startedNodes.forEach { it.registerInitiatedFlow(ModelIssueFlowResponder::class.java) }
+        startedNodes.forEach { it.registerInitiatedFlow(DataRowIssueFlowResponder::class.java) }
         mockNetwork.runNetwork()
     }
 
@@ -56,7 +50,7 @@ class ModelIssueFlowTests {
     /**
      * - Create a [TransactionBuilder] and pass it a notary reference.
      * - A notary [Party] object can be obtained from [FlowLogic.serviceHub.networkMapCache].
-     * - Create an [ModelContract.Commands.Issue] inside a new [Command].
+     * - Create an [DataRowContract.Commands.Issue] inside a new [Command].
      * - The required signers will be the same as the state's participants
      * - use [TransactionBuilder.withItems] to create the transaction instead
      * - Sign the transaction and convert it to a [SignedTransaction] using the [serviceHub.signInitialTransaction] method.
@@ -67,26 +61,28 @@ class ModelIssueFlowTests {
         val corpus = listOf<DataRowState>()
         val dataRowMap = LinkedHashMap<String, DataRowState>()
         val g1 = a.info.chooseIdentityAndCert().party
-        val g2 = b.info.chooseIdentityAndCert().party
-        val g3 = c.info.chooseIdentityAndCert().party
-        val g4 = d.info.chooseIdentityAndCert().party
-        val gateKeepers = listOf<Party>(g1,g2,g3,g4)
+
+        val gateKeepers = listOf<Party>(g1)
         val model = ModelState(corpus, dataRowMap, gateKeepers)
-        val flow = ModelIssueFlow(model)
-        val future = a.startFlow(flow)
+        val modelFlow = ModelIssueFlow(model)
+        a.startFlow(modelFlow)
         mockNetwork.runNetwork()
         // Return the unsigned(!) SignedTransaction object from the ModelIssueFlow.
+
+        val dataRow = DataRowState("This is an example utterance.", model, model.participants)
+        val dataRowFlow = DataRowIssueFlow(dataRow)
+        val future = a.startFlow(dataRowFlow)
         val ptx: SignedTransaction = future.getOrThrow()
 
         // Check the transaction is well formed...
         // No inputs, one output ModelState and a command with the right properties.
-        assert(ptx.tx.inputs.isEmpty())
-        assert(ptx.tx.outputs.single().data is ModelState)
+        //assert(ptx.tx.inputs.size == 1)
+        assert(ptx.tx.outputs.size == 1)
+        assert(ptx.tx.outputs.single().data is DataRowState)
         val command = ptx.tx.commands.single()
-        assert(command.value is ModelContract.Commands.Issue)
+        assert(command.value is DataRowContract.Commands.Issue)
         assert(command.signers.toSet() == model.participants.map { it.owningKey }.toSet())
         ptx.verifySignaturesExcept(
-                g2.owningKey, g3.owningKey, g4.owningKey,
                 mockNetwork.defaultNotaryNode.info.legalIdentitiesAndCerts.first().owningKey
         )
     }

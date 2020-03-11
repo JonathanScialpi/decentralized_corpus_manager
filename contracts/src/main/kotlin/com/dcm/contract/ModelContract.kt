@@ -27,31 +27,13 @@ class ModelContract: Contract {
                 "The participants of a model must have at least one party." using (model.participants.isNotEmpty())
             }
 
-            is Commands.AddGateKeepers -> requireThat {
-                "Only one input state should be consumed when adding a new gatekeeper to a model." using (tx.inputs.size == 1)
-                "Only one output state should be created when adding a new gatekeeper to a model" using (tx.outputs.size == 1)
-                val inputModel = tx.inputsOfType<ModelState>().single()
-                val outputModel = tx.outputsOfType<ModelState>().single()
-                "The inputState's gatekeeper list should have grown larger than that of the outputState's." using (inputModel.participants.size < outputModel.participants.size)
-                "The list of parties for required signers should be equivalent to the output state's proposed gatekeeper list." using (command.signers == outputModel.participants.map { it.owningKey })
-            }
-
-            is Commands.RemoveGateKeepers -> requireThat {
-                "Only one input state should be consumed when removing a new gatekeeper to a model." using (tx.inputs.size == 1)
-                "Only one output state should be created when removing a new gatekeeper to a model." using (tx.outputs.size == 1)
-                val outputModel = tx.outputsOfType<ModelState>().single()
-                "There must always be at least one gatekeeper in the gatekeeper list at all times." using (outputModel.participants.isNotEmpty())
-                val inputModel = tx.inputsOfType<ModelState>().single()
-                "The list of parties for required signers should be equivalent to the input state's proposed gatekeeper list." using (command.signers == inputModel.participants.map { it.owningKey })
-                "The inputState's gatekeeper list should have shrunk smaller than that of the outputState's." using (inputModel.participants.size > outputModel.participants.size)
-            }
-
             is Commands.AddDataRows -> requireThat {
                 "Only one input state should be consumed when adding a new DataRow to a model." using (tx.inputs.size == 1)
                 "Only one output state should be created when adding a new DataRow to a model." using (tx.outputs.size == 1)
                 val input = tx.inputsOfType<ModelState>().single()
                 val output = tx.outputsOfType<ModelState>().single()
-                "List of DataRows to add cannot be empty." using (input.dataRowMap != output.dataRowMap)
+                "List of DataRows to add cannot be empty." using (input.corpus != output.corpus)
+                "There must be more dataRows in the proposed model output state than the input state" using (input.corpus.size < output.corpus.size)
             }
 
             is Commands.RemoveDataRows -> requireThat {
@@ -59,7 +41,8 @@ class ModelContract: Contract {
                 "Only one output state should be created when removing a DataRow from a model." using (tx.outputs.size == 1)
                 val input = tx.inputsOfType<ModelState>().single()
                 val output = tx.outputsOfType<ModelState>().single()
-                "List of DataRows to add cannot be empty." using (input.dataRowMap != output.dataRowMap)
+                "List of DataRows to add cannot be empty." using (input.corpus != output.corpus)
+                "There must be less dataRows in the proposed model output state than the input state" using (input.corpus.size > output.corpus.size)
             }
         }
     }

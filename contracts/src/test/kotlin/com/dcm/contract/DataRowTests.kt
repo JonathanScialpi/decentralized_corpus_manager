@@ -1,9 +1,7 @@
 package com.dcm.contract
 
-import com.dcm.states.DataRowState
 import com.dcm.states.ModelState
 import net.corda.core.contracts.LinearState
-import net.corda.core.contracts.TypeOnlyCommandData
 import net.corda.core.identity.Party
 import net.corda.testing.node.MockServices
 import net.corda.testing.node.ledger

@@ -5,7 +5,6 @@ import com.dcm.flows.ModelAddGateKeeperFlowResponder
 import com.dcm.flows.ModelIssueFlow
 import com.dcm.flows.ModelIssueFlowResponder
 import com.dcm.flows.ModelUpdateGateKeeperFlow
-import com.dcm.states.DataRowState
 import com.dcm.states.ModelState
 import net.corda.core.contracts.StateRef
 import net.corda.core.contracts.TransactionVerificationException
