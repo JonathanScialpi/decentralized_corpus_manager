@@ -12,14 +12,23 @@ import kotlin.collections.LinkedHashMap
 
 /*********
 @Dev: The Model State Object represents the characteristics commonly found in Machine Learning Models.
-@param corpus List of DataRow State Objects.
-@param participants A list of party objects whom will act as gatekeepers of all the model's properties.
-@param modelID A unique identifier for reference.
+@param corpus each intent and its relative label -> intent:label.
+@param classificationReport the classification report for each label
+For example:
+    {
+        "MyLabelA": {
+        "precision": 0.9983108108108109,
+        "recall": 0.9949494949494949,
+        "f1-score": 0.9966273187183812,
+        "support": 594
+        }
+    }
+@param participants all contributers to the data set.
  *********/
 @BelongsToContract(ModelContract::class)
 data class ModelState(
         val corpus: LinkedHashMap<String, String>,
-        val labelsAndScoreMap: LinkedHashMap<String, LinkedHashMap<String, Double>>,
+        val classificationReport: LinkedHashMap<String, LinkedHashMap<String, Double>>,
         override val participants: List<Party>,
         override val linearId: UniqueIdentifier = UniqueIdentifier()) : LinearState{
 

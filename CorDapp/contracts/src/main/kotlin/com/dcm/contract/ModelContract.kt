@@ -25,6 +25,8 @@ class ModelContract: Contract {
                 "Only one output state should be created when issuing a Model." using (tx.outputs.size == 1)
                 val model = tx.outputsOfType<ModelState>().single()
                 "The participants of a model must have at least one party." using (model.participants.isNotEmpty())
+                "The corpus cannot be empty." using (model.corpus.isNotEmpty())
+                "The classification report cannot be empty." using(model.classificationReport.isNotEmpty())
             }
 
             is Commands.AddDataRows -> requireThat {
