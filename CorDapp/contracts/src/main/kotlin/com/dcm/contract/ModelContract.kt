@@ -14,8 +14,6 @@ class ModelContract: Contract {
         class Issue : TypeOnlyCommandData(), Commands
         class AddDataRows : TypeOnlyCommandData(), Commands
         class RemoveDataRows : TypeOnlyCommandData(), Commands
-        class AddGateKeepers : TypeOnlyCommandData(), Commands
-        class RemoveGateKeepers : TypeOnlyCommandData(), Commands
     }
     override fun verify(tx: LedgerTransaction) {
         val command = tx.commands.requireSingleCommand<ModelContract.Commands>()
