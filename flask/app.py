@@ -1,5 +1,4 @@
-import json
-from flask import Flask
+from flask import Flask, request, abort, jsonify
 from sklearn.pipeline import Pipeline
 from sklearn.linear_model import PassiveAggressiveClassifier
 from sklearn.model_selection import train_test_split
@@ -9,13 +8,14 @@ from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
 
 app = Flask(__name__)
 
-@app.route("/")
+@app.route("/", methods=['GET'])
 def home():
     return "Hello From flask > app.py..."
 
-@app.route("/classify")
-def passive_aggressive_classifier(path_to_file, list_of_goals=[]):
-    orig_file = open(path_to_file, "r", encoding="utf8")
+
+@app.route("/classify", methods=['POST'])
+def passive_aggressive_classifier():
+    orig_file = open(request.json["path_to_file"], "r", encoding="utf8")
     lines = orig_file.readlines()
 
     #loop through csv to build training_data and target_label_array
@@ -41,11 +41,9 @@ def passive_aggressive_classifier(path_to_file, list_of_goals=[]):
     predicted = text_clf.predict(X_test)
     #mean_output = mean(predicted == y_test)
 
-    classification_report_output = classification_report(y_test, predicted,target_names=list_of_goals)
+    classification_report_output = classification_report(y_test, predicted,output_dict=True, target_names=request.json["list_of_goals"])
                                             
     #confusion_matrix_output = confusion_matrix(y_test, predicted)
     #accuracy_output = accuracy_score(predicted, y_test)
 
-    output = json.dumps(classification_report_output, indent=2)
-
-    return output
+    return jsonify(classification_report_output)
