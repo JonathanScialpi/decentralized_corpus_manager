@@ -16,7 +16,7 @@ import net.corda.core.transactions.TransactionBuilder
 
 @InitiatingFlow
 @StartableByRPC
-class ModelIssueFlow(
+class IssueModelFlow(
         private val corpus: LinkedHashMap<String, String>,
         private val classificationReport: LinkedHashMap<String, LinkedHashMap<String, Double>>,
         private val targetModelNode : Party
@@ -35,11 +35,10 @@ class ModelIssueFlow(
         val session = initiateFlow(targetModelNode)
         val stx = subFlow(CollectSignaturesFlow(ptx, listOf(session)))
         return subFlow(FinalityFlow(stx, listOf(session)))
-
     }
 }
 
-@InitiatedBy(ModelIssueFlow::class)
+@InitiatedBy(IssueModelFlow::class)
 class ModelIssueFlowResponder(val counterpartySession: FlowSession): FlowLogic<SignedTransaction>() {
 
     @Suspendable

@@ -12,8 +12,8 @@ class ModelContract: Contract {
     }
     interface Commands : CommandData {
         class Issue : TypeOnlyCommandData(), Commands
-        class AddDataRows : TypeOnlyCommandData(), Commands
-        class RemoveDataRows : TypeOnlyCommandData(), Commands
+        class UpdateCorpus : TypeOnlyCommandData(), Commands
+//        class RemoveDataRows : TypeOnlyCommandData(), Commands
     }
     override fun verify(tx: LedgerTransaction) {
         val command = tx.commands.requireSingleCommand<ModelContract.Commands>()
@@ -27,13 +27,13 @@ class ModelContract: Contract {
                 "The classification report cannot be empty." using(model.classificationReport.isNotEmpty())
             }
 
-            is Commands.AddDataRows -> requireThat {
+            is Commands.UpdateCorpus -> requireThat {
                 "Only one input state should be consumed when adding a new DataRow to a model." using (tx.inputs.size == 1)
                 "Only one output state should be created when adding a new DataRow to a model." using (tx.outputs.size == 1)
                 val input = tx.inputsOfType<ModelState>().single()
                 val output = tx.outputsOfType<ModelState>().single()
-                "List of DataRows to add cannot be empty." using (input.corpus != output.corpus)
-                "There must be more dataRows in the proposed model output state than the input state" using (input.corpus.size < output.corpus.size)
+                "Proposed corpus cannot be the same as the inputState's." using (input.corpus != output.corpus)
+                //"There must be more dataRows in the proposed model output state than the input state" using (input.corpus.size < output.corpus.size)
                 "You cannot change the model's labels." using (input.classificationReport.size == output.classificationReport.size)
                 var delta = 0.00
                 for((k,v) in input.classificationReport){
@@ -41,24 +41,7 @@ class ModelContract: Contract {
                         delta += (output.classificationReport[k]?.get(x)!! - y)
                     }
                 }
-                "Your change must have some sort of positive affect on the model's classification report" using(delta > 0)
-            }
-
-            is Commands.RemoveDataRows -> requireThat {
-                "Only one input state should be consumed when removing a DataRow from a model." using (tx.inputs.size == 1)
-                "Only one output state should be created when removing a DataRow from a model." using (tx.outputs.size == 1)
-                val input = tx.inputsOfType<ModelState>().single()
-                val output = tx.outputsOfType<ModelState>().single()
-                "List of DataRows to add cannot be empty." using (input.corpus != output.corpus)
-                "There must be less dataRows in the proposed model output state than the input state" using (input.corpus.size > output.corpus.size)
-                "You cannot change the model's labels." using (input.classificationReport.size == output.classificationReport.size)
-                var delta = 0.00
-                for((k,v) in input.classificationReport){
-                    for ((x,y) in v){
-                        delta += (output.classificationReport[k]?.get(x)!! - y)
-                    }
-                }
-                "Your change must have some sort of positive affect on the model's classification report" using(delta > 0)
+                "Your change must have some sort of positive affect on the model's classification report" using (delta > 0)
             }
         }
     }
