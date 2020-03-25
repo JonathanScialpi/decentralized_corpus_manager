@@ -13,7 +13,6 @@ class ModelContract: Contract {
     interface Commands : CommandData {
         class Issue : TypeOnlyCommandData(), Commands
         class UpdateCorpus : TypeOnlyCommandData(), Commands
-//        class RemoveDataRows : TypeOnlyCommandData(), Commands
     }
     override fun verify(tx: LedgerTransaction) {
         val command = tx.commands.requireSingleCommand<ModelContract.Commands>()
