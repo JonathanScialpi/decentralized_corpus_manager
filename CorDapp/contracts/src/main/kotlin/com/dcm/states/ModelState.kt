@@ -32,15 +32,12 @@ data class ModelState(
         override val participants: List<Party>,
         override val linearId: UniqueIdentifier = UniqueIdentifier()) : LinearState{
 
-    fun addDataRows(dataRowsToAdd: LinkedHashMap<String, String>) : ModelState{
-        val newCorpus = LinkedHashMap(corpus)
-        dataRowsToAdd.map{newCorpus.put(it.key, it.value)}
+    fun replaceModelCorpus(newCorpus: LinkedHashMap<String, String>) : ModelState{
         return copy(corpus = newCorpus)
     }
 
-    fun removeDataRows(dataRowsToRemove: LinkedHashMap<String, String>) : ModelState{
-        val newCorpus = LinkedHashMap(corpus)
-        dataRowsToRemove.map{newCorpus.remove(it.key)}
-        return copy(corpus = newCorpus)
+    fun replaceClassificationReport( newClassificationReport: LinkedHashMap<String, LinkedHashMap<String, Double>>) : ModelState {
+        return copy(classificationReport = newClassificationReport)
     }
+
 }

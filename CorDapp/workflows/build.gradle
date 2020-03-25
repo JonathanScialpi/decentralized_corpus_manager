@@ -50,6 +50,9 @@ dependencies {
 
     // CorDapp dependencies.
     cordapp project(":contracts")
+
+    compile "com.squareup.okhttp3:okhttp:$okhttp_version"
+    implementation "com.google.code.gson:gson:$gson_version"
 }
 
 task integrationTest(type: Test, dependsOn: []) {
