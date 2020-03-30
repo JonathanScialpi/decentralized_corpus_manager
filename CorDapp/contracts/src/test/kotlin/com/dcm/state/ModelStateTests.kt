@@ -9,47 +9,43 @@ import net.corda.training.BOB
 import org.junit.Before
 
 class ModelStateTests {
-    private var testClassificationReport : LinkedHashMap<String, LinkedHashMap<String, Double>> = LinkedHashMap<String, LinkedHashMap<String, Double>>()
+    private var origClassificationReport : LinkedHashMap<String, LinkedHashMap<String, Double>> = LinkedHashMap<String, LinkedHashMap<String, Double>>()
     private var newClassificationReport : LinkedHashMap<String, LinkedHashMap<String, Double>> =  LinkedHashMap<String, LinkedHashMap<String, Double>>()
     private var origCorpus : LinkedHashMap<String, String> =  LinkedHashMap<String, String>()
     private var newCorpus : LinkedHashMap<String, String> =  LinkedHashMap<String, String>()
 
     @Before
     fun setup(){
-        //var testClassificationReport : LinkedHashMap<String, LinkedHashMap<String, Double>> =
-        testClassificationReport["BookRestaurant"]?.set("f1-score", 0.9975103734439834)
-        testClassificationReport["BookRestaurant"]?.set("precision", 0.9983388704318937)
-        testClassificationReport["BookRestaurant"]?.set("recall", 0.9966832504145937)
-        testClassificationReport["BookRestaurant"]?.set("support", 603.0)
-        testClassificationReport["GetWeather"]?.set("f1-score", 0.9966273187183812)
-        testClassificationReport["GetWeather"]?.set("precision", 0.9983108108108109)
-        testClassificationReport["GetWeather"]?.set("recall", 0.9949494949494949)
-        testClassificationReport["GetWeather"]?.set("support", 594.0)
-        testClassificationReport["Negative"]?.set("f1-score", 0.9993197278911564)
-        testClassificationReport["Negative"]?.set("precision", 0.9989799387963277)
-        testClassificationReport["Negative"]?.set("recall", 0.9996597482136781)
-        testClassificationReport["Negative"]?.set("support", 2939.0)
+        origClassificationReport["BookRestaurant"] = linkedMapOf("f1-score" to 0.9975103734439834)
+        origClassificationReport["BookRestaurant"] = linkedMapOf("precision" to 0.9983388704318937)
+        origClassificationReport["BookRestaurant"] = linkedMapOf("recall" to 0.9966832504145937)
+        origClassificationReport["BookRestaurant"] = linkedMapOf("support" to 603.0)
+        origClassificationReport["GetWeather"] = linkedMapOf("f1-score" to 0.9966273187183812)
+        origClassificationReport["GetWeather"] = linkedMapOf("precision" to 0.9983108108108109)
+        origClassificationReport["GetWeather"] = linkedMapOf("recall" to 0.9949494949494949)
+        origClassificationReport["GetWeather"] = linkedMapOf("support" to 594.0)
+        origClassificationReport["Negative"] = linkedMapOf("f1-score" to 0.9993197278911564)
+        origClassificationReport["Negative"] = linkedMapOf("precision" to 0.9989799387963277)
+        origClassificationReport["Negative"] = linkedMapOf("recall" to 0.9996597482136781)
+        origClassificationReport["Negative"] = linkedMapOf("support" to 2939.0)
 
-        //var newClassificationReport : LinkedHashMap<String, LinkedHashMap<String, Double>>
-        newClassificationReport["BookRestaurant"]?.set("f1-score", 0.998000)
-        newClassificationReport["BookRestaurant"]?.set("precision", 0.999000)
-        newClassificationReport["BookRestaurant"]?.set("recall", 0.997000)
-        newClassificationReport["BookRestaurant"]?.set("support", 624.0)
-        newClassificationReport["GetWeather"]?.set("f1-score", 0.997000)
-        newClassificationReport["GetWeather"]?.set("precision", 0.999000)
-        newClassificationReport["GetWeather"]?.set("recall", 0.995000)
-        newClassificationReport["GetWeather"]?.set("support", 597.0)
-        newClassificationReport["Negative"]?.set("f1-score", 0.9994000)
-        newClassificationReport["Negative"]?.set("precision", 0.999000)
-        newClassificationReport["Negative"]?.set("recall", 0.9997000)
-        newClassificationReport["Negative"]?.set("support", 2800.0)
+        newClassificationReport["BookRestaurant"] = linkedMapOf("f1-score" to 0.998000)
+        newClassificationReport["BookRestaurant"] = linkedMapOf("precision" to 0.999000)
+        newClassificationReport["BookRestaurant"] = linkedMapOf("recall" to 0.997000)
+        newClassificationReport["BookRestaurant"] = linkedMapOf("support" to 624.0)
+        newClassificationReport["GetWeather"] = linkedMapOf("f1-score" to 0.997000)
+        newClassificationReport["GetWeather"] = linkedMapOf("precision" to 0.999000)
+        newClassificationReport["GetWeather"] = linkedMapOf("recall" to 0.995000)
+        newClassificationReport["GetWeather"] = linkedMapOf("support" to 597.0)
+        newClassificationReport["Negative"] = linkedMapOf("f1-score" to 0.9994000)
+        newClassificationReport["Negative"] = linkedMapOf("precision" to 0.999000)
+        newClassificationReport["Negative"] = linkedMapOf("recall" to 0.9997000)
+        newClassificationReport["Negative"] = linkedMapOf("support" to 2800.0)
 
-        //var origCorpus : LinkedHashMap<String, String>
         origCorpus["What will the weather be this year in Horseshoe Lake State Fish and Wildlife Area?"] = "GetWeather"
         origCorpus["Book a bistro in New Zealand in 119 and a half days."] = "BookRestaurant"
         origCorpus["add how to my week end playlist"] = "Negative"
 
-        //var newCorpus : LinkedHashMap<String, String> =  LinkedHashMap<String, String>()
         newCorpus["What will the weather be this year in Horseshoe Lake State Fish and Wildlife Area?"] = "GetWeather"
         newCorpus["Will it snowstorm neighboring the Rio Grande Wild and Scenic River on feb. the second?"] = "GetWeather"
         newCorpus["Book a bistro in New Zealand in 119 and a half days."] = "BookRestaurant"
@@ -77,7 +73,7 @@ class ModelStateTests {
     fun checkReplaceModelCorpus(){
         val model = ModelState(
                 corpus = origCorpus,
-                classificationReport = testClassificationReport,
+                classificationReport = origClassificationReport,
                 participants = listOf(ALICE.party, BOB.party)
         )
 
@@ -88,7 +84,7 @@ class ModelStateTests {
     fun checkReplaceModelClassificationReport(){
         val model = ModelState(
             corpus = origCorpus,
-            classificationReport =testClassificationReport,
+            classificationReport =origClassificationReport,
             participants = listOf(ALICE.party, BOB.party)
         )
 
