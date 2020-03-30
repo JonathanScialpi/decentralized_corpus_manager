@@ -42,7 +42,7 @@ class IssueModelFlow(
         val response = OkHttpClient().newCall(request).execute()
         val classificationReport: LinkedHashMap<String, LinkedHashMap<String, Double>> = Gson().fromJson(response.body().string(), object : TypeToken<LinkedHashMap<String, LinkedHashMap<String, Double>>>() {}.type)
 
-        val outputModelState = ModelState(corpus, classificationReport, participants)
+        val outputModelState = ModelState(corpus, classificationReport, ourIdentity, participants)
         val commandData = ModelContract.Commands.Issue()
         transactionBuilder.addCommand(commandData, participants.map { it.owningKey })
         transactionBuilder.addOutputState(outputModelState, ModelContract.ID)

@@ -74,6 +74,7 @@ class ModelStateTests {
         val model = ModelState(
                 corpus = origCorpus,
                 classificationReport = origClassificationReport,
+                creator = ALICE.party,
                 participants = listOf(ALICE.party, BOB.party)
         )
 
@@ -84,7 +85,8 @@ class ModelStateTests {
     fun checkReplaceModelClassificationReport(){
         val model = ModelState(
             corpus = origCorpus,
-            classificationReport =origClassificationReport,
+            classificationReport = origClassificationReport,
+            creator = ALICE.party,
             participants = listOf(ALICE.party, BOB.party)
         )
 

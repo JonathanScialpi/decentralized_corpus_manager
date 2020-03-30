@@ -64,6 +64,7 @@ class ModelIssueTests {
         val model = ModelState(
                 corpus = origCorpus,
                 classificationReport = origClassificationReport,
+                creator = ALICE.party,
                 participants = listOf(ALICE.party, BOB.party)
         )
         ledgerServices.ledger {
@@ -85,25 +86,181 @@ class ModelIssueTests {
         val inputModelState = ModelState(
                 corpus = origCorpus,
                 classificationReport = origClassificationReport,
+                creator = ALICE.party,
                 participants = listOf(ALICE.party, BOB.party)
         )
         val outputModelState = ModelState(
                 corpus = newCorpus,
                 classificationReport = newClassificationReport,
+                creator = ALICE.party,
                 participants = listOf(ALICE.party, BOB.party)
         )
         ledgerServices.ledger {
             transaction {
                 input(ModelContract.ID, inputModelState)
                 output(ModelContract.ID,  outputModelState)
-                command(listOf(ALICE.publicKey, BOB.publicKey),  ModelContract.Commands.Issue()) // Wrong type.
+                command(listOf(ALICE.publicKey, BOB.publicKey),  ModelContract.Commands.Issue())
                 this `fails with` "No inputs should be consumed when issuing a Model."
             }
             transaction {
                 output(ModelContract.ID, outputModelState)
-                command(listOf(ALICE.publicKey, BOB.publicKey), ModelContract.Commands.Issue()) // Correct type.
+                command(listOf(ALICE.publicKey, BOB.publicKey), ModelContract.Commands.Issue())
                 this.verifies()
             }
         }
     }
+
+    @Test
+    fun mustHaveOneOutputState(){
+        val outputModelStateOne = ModelState(
+                corpus = origCorpus,
+                classificationReport = origClassificationReport,
+                creator = ALICE.party,
+                participants = listOf(ALICE.party, BOB.party)
+        )
+        val outputModelStateTwo = ModelState(
+                corpus = newCorpus,
+                classificationReport = newClassificationReport,
+                creator = ALICE.party,
+                participants = listOf(ALICE.party, BOB.party)
+        )
+        ledgerServices.ledger {
+            transaction {
+                output(ModelContract.ID, outputModelStateOne)
+                output(ModelContract.ID,  outputModelStateTwo)
+                command(listOf(ALICE.publicKey, BOB.publicKey),  ModelContract.Commands.Issue())
+                this `fails with` "Only one output state should be created when issuing a Model."
+            }
+            transaction {
+                output(ModelContract.ID, outputModelStateTwo)
+                command(listOf(ALICE.publicKey, BOB.publicKey), ModelContract.Commands.Issue())
+                this.verifies()
+            }
+        }
+    }
+
+    @Test
+    fun mustHaveAtLeastOneParty(){
+        val outputModelStateNoParties = ModelState(
+                corpus = newCorpus,
+                classificationReport = newClassificationReport,
+                creator = ALICE.party,
+                participants = listOf()
+        )
+
+        val outputModelState = ModelState(
+                corpus = newCorpus,
+                classificationReport = newClassificationReport,
+                creator = ALICE.party,
+                participants = listOf(ALICE.party)
+        )
+        ledgerServices.ledger {
+            transaction {
+                output(ModelContract.ID,  outputModelStateNoParties)
+                command(listOf(ALICE.publicKey),  ModelContract.Commands.Issue())
+                this `fails with` "The participants of a model must have at least one party."
+            }
+            transaction {
+                output(ModelContract.ID, outputModelState)
+                command(listOf(ALICE.publicKey), ModelContract.Commands.Issue())
+                this.verifies()
+            }
+        }
+    }
+
+    @Test
+    fun corpusCannotBeEmpty(){
+        var emptyCorpus : LinkedHashMap<String, String> =  LinkedHashMap<String, String>()
+
+        val outputModelStateEmptyCorpus = ModelState(
+                corpus = emptyCorpus,
+                classificationReport = newClassificationReport,
+                creator = ALICE.party,
+                participants = listOf(ALICE.party, BOB.party)
+        )
+
+        val outputModelState = ModelState(
+                corpus = newCorpus,
+                classificationReport = newClassificationReport,
+                creator = ALICE.party,
+                participants = listOf(ALICE.party, BOB.party)
+        )
+        ledgerServices.ledger {
+            transaction {
+                output(ModelContract.ID,  outputModelStateEmptyCorpus)
+                command(listOf(ALICE.publicKey, BOB.publicKey),  ModelContract.Commands.Issue())
+                this `fails with` "The corpus cannot be empty."
+            }
+            transaction {
+                output(ModelContract.ID, outputModelState)
+                command(listOf(ALICE.publicKey, BOB.publicKey), ModelContract.Commands.Issue())
+                this.verifies()
+            }
+        }
+    }
+
+    @Test
+    fun classificationReportCannotBeEmpty(){
+        var emptyClassificationReport : LinkedHashMap<String, LinkedHashMap<String, Double>> = LinkedHashMap<String, LinkedHashMap<String, Double>>()
+
+        val outputModelStateEmptyClassificationReport = ModelState(
+                corpus = origCorpus,
+                classificationReport = emptyClassificationReport,
+                creator = ALICE.party,
+                participants = listOf(ALICE.party, BOB.party)
+        )
+
+        val outputModelState = ModelState(
+                corpus = newCorpus,
+                classificationReport = newClassificationReport,
+                creator = ALICE.party,
+                participants = listOf(ALICE.party, BOB.party)
+        )
+        ledgerServices.ledger {
+            transaction {
+                output(ModelContract.ID,  outputModelStateEmptyClassificationReport)
+                command(listOf(ALICE.publicKey, BOB.publicKey),  ModelContract.Commands.Issue())
+                this `fails with` "The classification report cannot be empty."
+            }
+            transaction {
+                output(ModelContract.ID, outputModelState)
+                command(listOf(ALICE.publicKey, BOB.publicKey), ModelContract.Commands.Issue())
+                this.verifies()
+            }
+        }
+    }
+
+    @Test
+    fun creatorMustSign(){
+        val outputModelStateNoParties = ModelState(
+                corpus = newCorpus,
+                classificationReport = newClassificationReport,
+                creator = ALICE.party,
+                participants = listOf(ALICE.party, BOB.party)
+        )
+
+        val outputModelState = ModelState(
+                corpus = newCorpus,
+                classificationReport = newClassificationReport,
+                creator = ALICE.party,
+                participants = listOf(ALICE.party)
+        )
+        ledgerServices.ledger {
+            transaction {
+                output(ModelContract.ID,  outputModelStateNoParties)
+                command(listOf(BOB.publicKey),  ModelContract.Commands.Issue())
+                this `fails with` "The creator must be included in the list of signers."
+            }
+            transaction {
+                output(ModelContract.ID, outputModelState)
+                command(listOf(ALICE.publicKey, BOB.publicKey), ModelContract.Commands.Issue())
+                this.verifies()
+            }
+        }
+    }
+
+    /*
+    "signers must at least be the creator"
+    "creator cannot be empty"
+     */
 }
