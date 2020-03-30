@@ -3,6 +3,8 @@ package com.dcm.flows
 import co.paralleluniverse.fibers.Suspendable
 import com.dcm.contract.ModelContract
 import com.dcm.states.ModelState
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import net.corda.core.contracts.Command
 import net.corda.core.contracts.StateAndContract
 import net.corda.core.contracts.UniqueIdentifier
@@ -13,28 +15,43 @@ import net.corda.core.node.services.queryBy
 import net.corda.core.node.services.vault.QueryCriteria
 import net.corda.core.transactions.SignedTransaction
 import net.corda.core.transactions.TransactionBuilder
+import okhttp3.FormBody
+import okhttp3.OkHttpClient
+import okhttp3.Request
 
 @InitiatingFlow
 @StartableByRPC
 class IssueModelFlow(
         private val corpus: LinkedHashMap<String, String>,
-        private val classificationReport: LinkedHashMap<String, LinkedHashMap<String, Double>>,
-        private val targetModelNode : Party
+        private val participants : List<Party>
 ): FlowLogic<SignedTransaction>() {
     @Suspendable
     override fun call(): SignedTransaction{
-        val participants = listOf<Party>(ourIdentity, targetModelNode)
         val notary = serviceHub.networkMapCache.notaryIdentities.first()
         val transactionBuilder = TransactionBuilder(notary)
-        val output = ModelState(corpus, classificationReport, participants)
+
+        // get new classification report
+        val formBody = FormBody.Builder()
+                .add("corpus", Gson().toJson(corpus))
+                .build()
+        val request = Request.Builder()
+                .url(CLASSIFY_URL)
+                .post(formBody)
+                .addHeader("Content-Type", "application/json")
+                .build()
+        val response = OkHttpClient().newCall(request).execute()
+        val classificationReport: LinkedHashMap<String, LinkedHashMap<String, Double>> = Gson().fromJson(response.body().string(), object : TypeToken<LinkedHashMap<String, LinkedHashMap<String, Double>>>() {}.type)
+
+        val outputModelState = ModelState(corpus, classificationReport, participants)
         val commandData = ModelContract.Commands.Issue()
-        transactionBuilder.addCommand(commandData, participants.map { it -> it.owningKey })
-        transactionBuilder.addOutputState(output, ModelContract.ID)
+        transactionBuilder.addCommand(commandData, participants.map { it.owningKey })
+        transactionBuilder.addOutputState(outputModelState, ModelContract.ID)
         transactionBuilder.verify(serviceHub)
+
         val ptx = serviceHub.signInitialTransaction(transactionBuilder)
-        val session = initiateFlow(targetModelNode)
-        val stx = subFlow(CollectSignaturesFlow(ptx, listOf(session)))
-        return subFlow(FinalityFlow(stx, listOf(session)))
+        val sessions = (participants - ourIdentity).map { initiateFlow(it) }.toSet()
+        val stx = subFlow(CollectSignaturesFlow(ptx, sessions))
+        return subFlow(FinalityFlow(stx, sessions))
     }
 }
 
