@@ -25,7 +25,6 @@ class ModelContract: Contract {
                 "The participants of a model must have at least one party." using (model.participants.isNotEmpty())
                 "The corpus cannot be empty." using (model.corpus.isNotEmpty())
                 "The classification report cannot be empty." using(model.classificationReport.isNotEmpty())
-                "Model must have a creator." using (model.creator != null)
                 "The creator must be included in the list of signers." using (model.creator.owningKey in command.signers)
             }
 

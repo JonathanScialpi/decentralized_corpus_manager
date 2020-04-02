@@ -258,9 +258,4 @@ class ModelIssueTests {
             }
         }
     }
-
-    /*
-    "signers must at least be the creator"
-    "creator cannot be empty"
-     */
 }

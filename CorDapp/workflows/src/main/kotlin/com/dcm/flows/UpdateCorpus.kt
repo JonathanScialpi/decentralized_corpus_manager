@@ -3,24 +3,21 @@ package com.dcm.flows
 import co.paralleluniverse.fibers.Suspendable
 import com.dcm.contract.ModelContract
 import com.dcm.states.ModelState
-import com.sun.istack.NotNull
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
+import net.corda.core.contracts.UniqueIdentifier
+import net.corda.core.contracts.requireThat
 import net.corda.core.flows.*
 import net.corda.core.identity.Party
 import net.corda.core.node.services.queryBy
 import net.corda.core.node.services.vault.QueryCriteria
 import net.corda.core.transactions.SignedTransaction
 import net.corda.core.transactions.TransactionBuilder
-import java.util.*
-import kotlin.collections.LinkedHashMap
+import okhttp3.FormBody
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
-import net.corda.core.contracts.*
-import okhttp3.FormBody
-import okhttp3.RequestBody
 
-const val CLASSIFY_URL = "http://localhost:5000/classify"
+const val CLASSIFY_URL = "http://127.0.0.1:5000/classify"
 
 @InitiatingFlow
 @StartableByRPC
