@@ -13,45 +13,44 @@ import net.corda.core.node.services.queryBy
 import net.corda.core.node.services.vault.QueryCriteria
 import net.corda.core.transactions.SignedTransaction
 import net.corda.core.transactions.TransactionBuilder
-import okhttp3.FormBody
-import okhttp3.OkHttpClient
-import okhttp3.Request
-
-const val CLASSIFY_URL = "http://127.0.0.1:5000/classify"
+import okhttp3.*
 
 @InitiatingFlow
 @StartableByRPC
 class UpdateCorpus(
         private val proposedCorpus: LinkedHashMap<String, String>,
         private val modelLinearId: UniqueIdentifier,
-        private val targetModelNode : Party
+        private val participants : List<Party>
 ): FlowLogic<SignedTransaction>() {
     @Suspendable
     override fun call(): SignedTransaction{
-        val participants = listOf<Party>(ourIdentity, targetModelNode)
         val notary = serviceHub.networkMapCache.notaryIdentities.first()
         val transactionBuilder = TransactionBuilder(notary)
 
-        // get model state and use as input state
+        // get current model state and use as input state
         val queryCriteria = QueryCriteria.LinearStateQueryCriteria(linearId = listOf(modelLinearId))
         val modelStateAndRef =  serviceHub.vaultService.queryBy<ModelState>(queryCriteria).states.single()
+        transactionBuilder.addInputState(modelStateAndRef)
         val inputModelState = modelStateAndRef.state.data
         var outputModelState = inputModelState.replaceModelCorpus(proposedCorpus)
 
         // get new classification report
-        val formBody = FormBody.Builder()
-                .add("corpus", Gson().toJson(outputModelState.corpus))
-                .build()
+        val payload = LinkedHashMap<String, LinkedHashMap<String, String>>()
+        payload["corpus"] = proposedCorpus
+        val json = MediaType.parse("application/json; charset=utf-8")
+        val corpusJson =  Gson().toJson(payload)
+        val body = RequestBody.create(json, corpusJson)
         val request = Request.Builder()
                 .url(CLASSIFY_URL)
-                .post(formBody)
-                .addHeader("Content-Type", "application/json")
+                .post(body)
                 .build()
-        val response = OkHttpClient().newCall(request).execute()
+        var response = OkHttpClient().newCall(request).execute()
         val newClassificationReport: LinkedHashMap<String, LinkedHashMap<String, Double>> = Gson().fromJson(response.body().string(), object : TypeToken<LinkedHashMap<String, LinkedHashMap<String, Double>>>() {}.type)
-        outputModelState = outputModelState.replaceClassificationReport(newClassificationReport)
+        response.body().close()
+        response = null
 
         // finish building tx
+        outputModelState = outputModelState.replaceClassificationReport(newClassificationReport)
         val commandData = ModelContract.Commands.UpdateCorpus()
         transactionBuilder.addCommand(commandData, participants.map { it.owningKey })
         transactionBuilder.addOutputState(outputModelState, ModelContract.ID)
@@ -59,9 +58,9 @@ class UpdateCorpus(
 
         // sign and get other signatures
         val ptx = serviceHub.signInitialTransaction(transactionBuilder)
-        val session = initiateFlow(targetModelNode)
-        val stx = subFlow(CollectSignaturesFlow(ptx, listOf(session)))
-        return subFlow(FinalityFlow(stx, listOf(session)))
+        val sessions = (participants - ourIdentity).map { initiateFlow(it) }.toSet()
+        val stx = subFlow(CollectSignaturesFlow(ptx, sessions))
+        return subFlow(FinalityFlow(stx, sessions))
     }
 }
 

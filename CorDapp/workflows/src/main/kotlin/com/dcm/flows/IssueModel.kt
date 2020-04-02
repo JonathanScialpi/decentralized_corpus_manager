@@ -17,8 +17,11 @@ import net.corda.core.transactions.SignedTransaction
 import net.corda.core.transactions.TransactionBuilder
 import okhttp3.*
 
+const val CLASSIFY_URL = "http://127.0.0.1:5000/classify"
+
 @InitiatingFlow
 @StartableByRPC
+
 class IssueModelFlow(
         private val corpus: LinkedHashMap<String, String>,
         private val participants : List<Party>
@@ -42,12 +45,15 @@ class IssueModelFlow(
         val classificationReport: LinkedHashMap<String, LinkedHashMap<String, Double>> = Gson().fromJson(response.body().string(), object : TypeToken<LinkedHashMap<String, LinkedHashMap<String, Double>>>() {}.type)
         response.body().close()
         response = null
+
+        // finish building tx
         val outputModelState = ModelState(corpus, classificationReport, ourIdentity, participants)
         val commandData = ModelContract.Commands.Issue()
         transactionBuilder.addCommand(commandData, participants.map { it.owningKey })
         transactionBuilder.addOutputState(outputModelState, ModelContract.ID)
         transactionBuilder.verify(serviceHub)
 
+        // sign and get other signatures
         val ptx = serviceHub.signInitialTransaction(transactionBuilder)
         val sessions = (participants - ourIdentity).map { initiateFlow(it) }.toSet()
         val stx = subFlow(CollectSignaturesFlow(ptx, sessions))
