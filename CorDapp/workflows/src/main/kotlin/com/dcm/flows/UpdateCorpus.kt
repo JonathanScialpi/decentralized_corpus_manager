@@ -30,6 +30,7 @@ class UpdateCorpus(
         // get current model state and use as input state
         val queryCriteria = QueryCriteria.LinearStateQueryCriteria(linearId = listOf(modelLinearId))
         val modelStateAndRef =  serviceHub.vaultService.queryBy<ModelState>(queryCriteria).states.single()
+        transactionBuilder.addInputState(modelStateAndRef)
         val inputModelState = modelStateAndRef.state.data
         var outputModelState = inputModelState.replaceModelCorpus(proposedCorpus)
 
@@ -43,11 +44,13 @@ class UpdateCorpus(
                 .url(CLASSIFY_URL)
                 .post(body)
                 .build()
-        val response = OkHttpClient().newCall(request).execute()
+        var response = OkHttpClient().newCall(request).execute()
         val newClassificationReport: LinkedHashMap<String, LinkedHashMap<String, Double>> = Gson().fromJson(response.body().string(), object : TypeToken<LinkedHashMap<String, LinkedHashMap<String, Double>>>() {}.type)
-        outputModelState = outputModelState.replaceClassificationReport(newClassificationReport)
+        response.body().close()
+        response = null
 
         // finish building tx
+        outputModelState = outputModelState.replaceClassificationReport(newClassificationReport)
         val commandData = ModelContract.Commands.UpdateCorpus()
         transactionBuilder.addCommand(commandData, participants.map { it.owningKey })
         transactionBuilder.addOutputState(outputModelState, ModelContract.ID)
