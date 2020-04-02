@@ -14,10 +14,10 @@ class ModelIssueTests {
     // A pre-defined dummy command.
     class DummyCommand : TypeOnlyCommandData()
     private var ledgerServices = MockServices(listOf("com.dcm"))
-    private var origClassificationReport : LinkedHashMap<String, LinkedHashMap<String, Double>> = LinkedHashMap<String, LinkedHashMap<String, Double>>()
-    private var newClassificationReport : LinkedHashMap<String, LinkedHashMap<String, Double>> =  LinkedHashMap<String, LinkedHashMap<String, Double>>()
-    private var origCorpus : LinkedHashMap<String, String> =  LinkedHashMap<String, String>()
-    private var newCorpus : LinkedHashMap<String, String> =  LinkedHashMap<String, String>()
+    private var origClassificationReport = LinkedHashMap<String, LinkedHashMap<String, Double>>()
+    private var newClassificationReport = LinkedHashMap<String, LinkedHashMap<String, Double>>()
+    private var origCorpus =  LinkedHashMap<String, String>()
+    private var newCorpus =  LinkedHashMap<String, String>()
 
     @Before
     fun setup(){
@@ -201,7 +201,7 @@ class ModelIssueTests {
 
     @Test
     fun classificationReportCannotBeEmpty(){
-        var emptyClassificationReport : LinkedHashMap<String, LinkedHashMap<String, Double>> = LinkedHashMap<String, LinkedHashMap<String, Double>>()
+        var emptyClassificationReport = LinkedHashMap<String, LinkedHashMap<String, Double>>()
 
         val outputModelStateEmptyClassificationReport = ModelState(
                 corpus = origCorpus,
