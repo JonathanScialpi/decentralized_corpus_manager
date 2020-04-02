@@ -4,6 +4,8 @@ import com.dcm.contract.ModelContract
 import com.dcm.flows.IssueModelFlow
 import com.dcm.flows.ModelIssueFlowResponder
 import com.dcm.states.ModelState
+import com.google.gson.JsonSyntaxException
+import net.corda.core.contracts.TransactionVerificationException
 import net.corda.core.identity.CordaX500Name
 import net.corda.core.transactions.SignedTransaction
 import net.corda.core.utilities.getOrThrow
@@ -16,16 +18,18 @@ import net.corda.testing.node.StartedMockNode
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 
 class ModelIssueFlowTests {
 
     private lateinit var mockNetwork: MockNetwork
     private lateinit var a: StartedMockNode
     private lateinit var b: StartedMockNode
-    private var origClassificationReport : LinkedHashMap<String, LinkedHashMap<String, Double>> = LinkedHashMap<String, LinkedHashMap<String, Double>>()
-    private var newClassificationReport : LinkedHashMap<String, LinkedHashMap<String, Double>> =  LinkedHashMap<String, LinkedHashMap<String, Double>>()
-    private var origCorpus : LinkedHashMap<String, String> =  LinkedHashMap<String, String>()
-    private var newCorpus : LinkedHashMap<String, String> =  LinkedHashMap<String, String>()
+    private var origClassificationReport = LinkedHashMap<String, LinkedHashMap<String, Double>>()
+    private var newClassificationReport =  LinkedHashMap<String, LinkedHashMap<String, Double>>()
+    private var origCorpus =  LinkedHashMap<String, String>()
+    private var newCorpus = LinkedHashMap<String, String>()
 
     @Before
     fun setup() {
@@ -135,5 +139,63 @@ class ModelIssueFlowTests {
                 otherParty.owningKey,
                 mockNetwork.defaultNotaryNode.info.legalIdentitiesAndCerts.first().owningKey
         )
+    }
+
+    @Test
+    fun flowReturnsVerifiedPartiallySignedTransaction() {
+        // Check that an empty corpus fails
+        val creator = a.info.chooseIdentityAndCert().party
+        val otherParty = b.info.chooseIdentityAndCert().party
+        val emptyCorpus = LinkedHashMap<String, String>()
+        val emptyCorpusFlow = IssueModelFlow(
+                corpus = emptyCorpus,
+                participants = listOf(creator, otherParty)
+        )
+        val futureOne = a.startFlow(emptyCorpusFlow)
+        mockNetwork.runNetwork()
+        assertFailsWith<JsonSyntaxException> { futureOne.getOrThrow() }
+
+        // Check a good ModelState passes.
+        val futureTwo = a.startFlow(IssueModelFlow(
+                corpus = newCorpus,
+                participants = listOf(creator, otherParty)
+        ))
+        mockNetwork.runNetwork()
+        futureTwo.getOrThrow()
+    }
+
+    @Test
+    fun flowReturnsTransactionSignedByBothParties() {
+        val creator = a.info.chooseIdentityAndCert().party
+        val otherParty = b.info.chooseIdentityAndCert().party
+        val flow = IssueModelFlow(
+                corpus = newCorpus,
+                participants = listOf(creator, otherParty)
+        )
+        val future = a.startFlow(flow)
+        mockNetwork.runNetwork()
+        val stx = future.getOrThrow()
+        stx.verifyRequiredSignatures()
+    }
+
+    @Test
+    fun flowRecordsTheSameTransactionInBothPartyVaults() {
+        val creator = a.info.chooseIdentityAndCert().party
+        val otherParty = b.info.chooseIdentityAndCert().party
+        val flow = IssueModelFlow(
+                corpus = newCorpus,
+                participants = listOf(creator, otherParty)
+        )
+        val future = a.startFlow(flow)
+        mockNetwork.runNetwork()
+        val stx = future.getOrThrow()
+        println("Signed transaction hash: ${stx.id}")
+        listOf(a, b).map {
+            it.services.validatedTransactions.getTransaction(stx.id)
+        }.forEach {
+            val txHash = (it as SignedTransaction).id
+            println("$txHash == ${stx.id}")
+            assertEquals(stx.id, txHash)
+        }
     }
 }

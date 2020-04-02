@@ -9,10 +9,10 @@ import net.corda.training.BOB
 import org.junit.Before
 
 class ModelStateTests {
-    private var origClassificationReport : LinkedHashMap<String, LinkedHashMap<String, Double>> = LinkedHashMap<String, LinkedHashMap<String, Double>>()
-    private var newClassificationReport : LinkedHashMap<String, LinkedHashMap<String, Double>> =  LinkedHashMap<String, LinkedHashMap<String, Double>>()
-    private var origCorpus : LinkedHashMap<String, String> =  LinkedHashMap<String, String>()
-    private var newCorpus : LinkedHashMap<String, String> =  LinkedHashMap<String, String>()
+    private var origClassificationReport = LinkedHashMap<String, LinkedHashMap<String, Double>>()
+    private var newClassificationReport =  LinkedHashMap<String, LinkedHashMap<String, Double>>()
+    private var origCorpus =  LinkedHashMap<String, String>()
+    private var newCorpus =  LinkedHashMap<String, String>()
 
     @Before
     fun setup(){
