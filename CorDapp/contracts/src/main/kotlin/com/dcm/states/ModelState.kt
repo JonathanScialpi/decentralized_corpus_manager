@@ -28,7 +28,7 @@ For example:
 @BelongsToContract(ModelContract::class)
 data class ModelState(
         val corpus: LinkedHashMap<String, String>,
-        val classificationReport: LinkedHashMap<String, LinkedHashMap<String, Double>>,
+        val classificationReport: Map<String, LinkedHashMap<String, Double>>,
         val creator: Party,
         override val participants: List<Party>,
         override val linearId: UniqueIdentifier = UniqueIdentifier()) : LinearState{

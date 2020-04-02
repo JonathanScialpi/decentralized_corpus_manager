@@ -15,9 +15,7 @@ import net.corda.core.node.services.queryBy
 import net.corda.core.node.services.vault.QueryCriteria
 import net.corda.core.transactions.SignedTransaction
 import net.corda.core.transactions.TransactionBuilder
-import okhttp3.FormBody
-import okhttp3.OkHttpClient
-import okhttp3.Request
+import okhttp3.*
 
 @InitiatingFlow
 @StartableByRPC
@@ -31,17 +29,19 @@ class IssueModelFlow(
         val transactionBuilder = TransactionBuilder(notary)
 
         // get new classification report
-        val formBody = FormBody.Builder()
-                .add("corpus", Gson().toJson(corpus))
-                .build()
+        val payload = LinkedHashMap<String, LinkedHashMap<String, String>>()
+        payload["corpus"] = corpus
+        val json = MediaType.parse("application/json; charset=utf-8")
+        val corpusJson =  Gson().toJson(payload)
+        val body = RequestBody.create(json, corpusJson)
         val request = Request.Builder()
                 .url(CLASSIFY_URL)
-                .post(formBody)
-                .addHeader("Content-Type", "application/json")
+                .post(body)
                 .build()
-        val response = OkHttpClient().newCall(request).execute()
+        var response = OkHttpClient().newCall(request).execute()
         val classificationReport: LinkedHashMap<String, LinkedHashMap<String, Double>> = Gson().fromJson(response.body().string(), object : TypeToken<LinkedHashMap<String, LinkedHashMap<String, Double>>>() {}.type)
-
+        response.body().close()
+        response = null
         val outputModelState = ModelState(corpus, classificationReport, ourIdentity, participants)
         val commandData = ModelContract.Commands.Issue()
         transactionBuilder.addCommand(commandData, participants.map { it.owningKey })
