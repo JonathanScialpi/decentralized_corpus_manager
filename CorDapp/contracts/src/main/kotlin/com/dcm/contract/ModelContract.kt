@@ -42,6 +42,7 @@ class ModelContract: Contract {
                     }
                 }
                 "Your change must have some sort of positive affect on the model's classification report. Your delta was: $delta" using (delta > 0)
+                "The creator must be included in the list of signers." using (output.creator.owningKey in command.signers)
             }
         }
     }
