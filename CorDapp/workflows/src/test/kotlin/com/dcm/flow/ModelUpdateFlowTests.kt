@@ -5,6 +5,7 @@ import com.dcm.flows.IssueModelFlow
 import com.dcm.flows.ModelIssueFlowResponder
 import com.dcm.flows.UpdateCorpus
 import com.dcm.states.ModelState
+import net.corda.core.contracts.TransactionVerificationException
 import net.corda.core.identity.CordaX500Name
 import net.corda.core.transactions.SignedTransaction
 import net.corda.core.utilities.getOrThrow
@@ -16,6 +17,7 @@ import net.corda.testing.node.StartedMockNode
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
+import kotlin.test.assertFailsWith
 
 class ModelUpdateFlowTests {
     private lateinit var mockNetwork: MockNetwork
@@ -149,7 +151,7 @@ class ModelUpdateFlowTests {
         newCorpus["Add track to my Digster Future Hits"] = "Negative"
         newCorpus["add the piano bar to my Cindy Wilson"] = "Negative"
         newCorpus["Add Spanish Harlem Incident to cleaning the house"] = "Negative"
-        newCorpus["add The Greyest of Blue Skies in Indie EspaÃ±ol my playlist"] = "Negative"
+        newCorpus["add The Greyest of Blue Skies in Indie Espa±ol my playlist"] = "Negative"
         newCorpus["Add the name kids in the street to the plylist New Indie Mix"] = "Negative"
         newCorpus["add album radar latino"] = "Negative"
         newCorpus["Add Tranquility to the Latin Pop Rising playlist."] = "Negative"
@@ -171,7 +173,7 @@ class ModelUpdateFlowTests {
     }
 
     @Test
-    fun updateAModel() {
+    fun improveModel() {
         val creator = a.info.chooseIdentityAndCert().party
         val otherParty = b.info.chooseIdentityAndCert().party
         val flow = IssueModelFlow(
@@ -184,11 +186,32 @@ class ModelUpdateFlowTests {
         val origModel = future.getOrThrow().tx.outputs.single().data as ModelState
         val flowTwo = UpdateCorpus(
                 proposedCorpus = newCorpus,
-                modelLinearId = origModel.linearId,
-                participants = listOf(creator, otherParty)
+                modelLinearId = origModel.linearId
         )
         val futureTwo = b.startFlow(flowTwo)
         mockNetwork.runNetwork()
         futureTwo.getOrThrow()
     }
+
+    @Test
+    fun worsenModel() {
+        val creator = a.info.chooseIdentityAndCert().party
+        val otherParty = b.info.chooseIdentityAndCert().party
+        val flow = IssueModelFlow(
+                corpus = newCorpus,
+                participants = listOf(creator, otherParty)
+        )
+        val future = a.startFlow(flow)
+        mockNetwork.runNetwork()
+
+        val origModel = future.getOrThrow().tx.outputs.single().data as ModelState
+        val flowTwo = UpdateCorpus(
+                proposedCorpus = origCorpus,
+                modelLinearId = origModel.linearId
+        )
+        val futureTwo = b.startFlow(flowTwo)
+        mockNetwork.runNetwork()
+        assertFailsWith<TransactionVerificationException> {futureTwo.getOrThrow()}
+    }
+
 }

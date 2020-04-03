@@ -19,8 +19,7 @@ import okhttp3.*
 @StartableByRPC
 class UpdateCorpus(
         private val proposedCorpus: LinkedHashMap<String, String>,
-        private val modelLinearId: UniqueIdentifier,
-        private val participants : List<Party>
+        private val modelLinearId: UniqueIdentifier
 ): FlowLogic<SignedTransaction>() {
     @Suspendable
     override fun call(): SignedTransaction{
@@ -52,13 +51,13 @@ class UpdateCorpus(
         // finish building tx
         outputModelState = outputModelState.replaceClassificationReport(newClassificationReport)
         val commandData = ModelContract.Commands.UpdateCorpus()
-        transactionBuilder.addCommand(commandData, participants.map { it.owningKey })
+        transactionBuilder.addCommand(commandData, inputModelState.participants.map { it.owningKey })
         transactionBuilder.addOutputState(outputModelState, ModelContract.ID)
         transactionBuilder.verify(serviceHub)
 
         // sign and get other signatures
         val ptx = serviceHub.signInitialTransaction(transactionBuilder)
-        val sessions = (participants - ourIdentity).map { initiateFlow(it) }.toSet()
+        val sessions = (inputModelState.participants - ourIdentity).map { initiateFlow(it) }.toSet()
         val stx = subFlow(CollectSignaturesFlow(ptx, sessions))
         return subFlow(FinalityFlow(stx, sessions))
     }
