@@ -186,8 +186,7 @@ class ModelUpdateFlowTests {
         val origModel = future.getOrThrow().tx.outputs.single().data as ModelState
         val flowTwo = UpdateCorpus(
                 proposedCorpus = newCorpus,
-                modelLinearId = origModel.linearId,
-                participants = listOf(creator, otherParty)
+                modelLinearId = origModel.linearId
         )
         val futureTwo = b.startFlow(flowTwo)
         mockNetwork.runNetwork()
@@ -208,8 +207,7 @@ class ModelUpdateFlowTests {
         val origModel = future.getOrThrow().tx.outputs.single().data as ModelState
         val flowTwo = UpdateCorpus(
                 proposedCorpus = origCorpus,
-                modelLinearId = origModel.linearId,
-                participants = listOf(creator, otherParty)
+                modelLinearId = origModel.linearId
         )
         val futureTwo = b.startFlow(flowTwo)
         mockNetwork.runNetwork()
