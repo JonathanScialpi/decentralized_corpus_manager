@@ -1,13 +1,12 @@
 package com.dcm.flow
 
-import com.dcm.contract.ModelContract
+import com.dcm.flows.CloseModelFlow
 import com.dcm.flows.IssueModelFlow
 import com.dcm.flows.ModelIssueFlowResponder
-import com.dcm.flows.UpdateCorpus
+import com.dcm.flows.UpdateClassificationURL
 import com.dcm.states.ModelState
 import net.corda.core.contracts.TransactionVerificationException
 import net.corda.core.identity.CordaX500Name
-import net.corda.core.transactions.SignedTransaction
 import net.corda.core.utilities.getOrThrow
 import net.corda.testing.internal.chooseIdentityAndCert
 import net.corda.testing.node.MockNetwork
@@ -19,7 +18,7 @@ import org.junit.Before
 import org.junit.Test
 import kotlin.test.assertFailsWith
 
-class ModelUpdateFlowTests {
+class CloseModelTests {
     private lateinit var mockNetwork: MockNetwork
     private lateinit var a: StartedMockNode
     private lateinit var b: StartedMockNode
@@ -173,10 +172,12 @@ class ModelUpdateFlowTests {
     }
 
     @Test
-    fun improveModel() {
+    fun closeModel() {
         val creator = a.info.chooseIdentityAndCert().party
         val otherParty = b.info.chooseIdentityAndCert().party
         val flow = IssueModelFlow(
+                algorithmUsed = "Passive Aggressive",
+                classificationURL = "http://127.0.0.1:5000/classify",
                 corpus = origCorpus,
                 participants = listOf(creator, otherParty)
         )
@@ -184,34 +185,41 @@ class ModelUpdateFlowTests {
         mockNetwork.runNetwork()
 
         val origModel = future.getOrThrow().tx.outputs.single().data as ModelState
-        val flowTwo = UpdateCorpus(
-                proposedCorpus = newCorpus,
+        val flowTwo = CloseModelFlow(
                 modelLinearId = origModel.linearId
         )
-        val futureTwo = b.startFlow(flowTwo)
+        val futureTwo = a.startFlow(flowTwo)
         mockNetwork.runNetwork()
         futureTwo.getOrThrow()
     }
 
     @Test
-    fun worsenModel() {
+    fun closeModelAndUpdate() {
         val creator = a.info.chooseIdentityAndCert().party
         val otherParty = b.info.chooseIdentityAndCert().party
         val flow = IssueModelFlow(
-                corpus = newCorpus,
+                algorithmUsed = "Passive Aggressive",
+                classificationURL = "http://127.0.0.1:5000/classify",
+                corpus = origCorpus,
                 participants = listOf(creator, otherParty)
         )
         val future = a.startFlow(flow)
         mockNetwork.runNetwork()
 
         val origModel = future.getOrThrow().tx.outputs.single().data as ModelState
-        val flowTwo = UpdateCorpus(
-                proposedCorpus = origCorpus,
+        val flowTwo = CloseModelFlow(
                 modelLinearId = origModel.linearId
         )
-        val futureTwo = b.startFlow(flowTwo)
+        val futureTwo = a.startFlow(flowTwo)
         mockNetwork.runNetwork()
-        assertFailsWith<TransactionVerificationException> {futureTwo.getOrThrow()}
-    }
+        //val closedModel = futureTwo.getOrThrow().tx.outputs.single().data as ModelState
 
+        val flowThree = UpdateClassificationURL(
+                newURL = "http://127.0.0.1:5000/classify",
+                modelLinearId = origModel.linearId
+        )
+        val futureThree = a.startFlow(flowThree)
+        mockNetwork.runNetwork()
+        assertFailsWith<Exception> {futureThree.getOrThrow()}
+    }
 }

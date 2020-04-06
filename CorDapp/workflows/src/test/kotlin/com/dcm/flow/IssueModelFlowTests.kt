@@ -21,7 +21,7 @@ import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 
-class ModelIssueFlowTests {
+class IssueModelFlowTests {
 
     private lateinit var mockNetwork: MockNetwork
     private lateinit var a: StartedMockNode
@@ -119,6 +119,8 @@ class ModelIssueFlowTests {
         val creator = a.info.chooseIdentityAndCert().party
         val otherParty = b.info.chooseIdentityAndCert().party
         val flow = IssueModelFlow(
+                algorithmUsed = "Passive Aggressive",
+                classificationURL = "http://127.0.0.1:5000/classify",
                 corpus = newCorpus,
                 participants = listOf(creator, otherParty)
         )
@@ -148,6 +150,8 @@ class ModelIssueFlowTests {
         val otherParty = b.info.chooseIdentityAndCert().party
         val emptyCorpus = LinkedHashMap<String, String>()
         val emptyCorpusFlow = IssueModelFlow(
+                algorithmUsed = "Passive Aggressive",
+                classificationURL = "http://127.0.0.1:5000/classify",
                 corpus = emptyCorpus,
                 participants = listOf(creator, otherParty)
         )
@@ -157,6 +161,8 @@ class ModelIssueFlowTests {
 
         // Check a good ModelState passes.
         val futureTwo = a.startFlow(IssueModelFlow(
+                algorithmUsed = "Passive Aggressive",
+                classificationURL = "http://127.0.0.1:5000/classify",
                 corpus = newCorpus,
                 participants = listOf(creator, otherParty)
         ))
@@ -169,6 +175,8 @@ class ModelIssueFlowTests {
         val creator = a.info.chooseIdentityAndCert().party
         val otherParty = b.info.chooseIdentityAndCert().party
         val flow = IssueModelFlow(
+                algorithmUsed = "Passive Aggressive",
+                classificationURL = "http://127.0.0.1:5000/classify",
                 corpus = newCorpus,
                 participants = listOf(creator, otherParty)
         )
@@ -183,6 +191,8 @@ class ModelIssueFlowTests {
         val creator = a.info.chooseIdentityAndCert().party
         val otherParty = b.info.chooseIdentityAndCert().party
         val flow = IssueModelFlow(
+                algorithmUsed = "Passive Aggressive",
+                classificationURL = "http://127.0.0.1:5000/classify",
                 corpus = newCorpus,
                 participants = listOf(creator, otherParty)
         )

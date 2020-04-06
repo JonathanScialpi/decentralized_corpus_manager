@@ -56,6 +56,12 @@ class ModelStateTests {
 
     @Test
     fun hasAllFieldsAndProperTypes(){
+        ModelState::class.java.getDeclaredField("algorithmUsed")
+        assertEquals(ModelState::class.java.getDeclaredField("algorithmUsed").type, String::class.java)
+
+        ModelState::class.java.getDeclaredField("classificationURL")
+        assertEquals(ModelState::class.java.getDeclaredField("classificationURL").type, String::class.java)
+
         ModelState::class.java.getDeclaredField("corpus")
         assertEquals(ModelState::class.java.getDeclaredField("corpus").type, LinkedHashMap::class.java)
 
@@ -72,9 +78,11 @@ class ModelStateTests {
     @Test
     fun checkReplaceModelCorpus(){
         val model = ModelState(
+                algorithmUsed = "Passive Aggressive",
+                classificationURL = "http://127.0.0.1:5000/classify",
                 corpus = origCorpus,
                 classificationReport = origClassificationReport,
-                creator = ALICE.party,
+                owner = ALICE.party,
                 participants = listOf(ALICE.party, BOB.party)
         )
 
@@ -84,10 +92,12 @@ class ModelStateTests {
     @Test
     fun checkReplaceModelClassificationReport(){
         val model = ModelState(
-            corpus = origCorpus,
-            classificationReport = origClassificationReport,
-            creator = ALICE.party,
-            participants = listOf(ALICE.party, BOB.party)
+                algorithmUsed = "Passive Aggressive",
+                classificationURL = "http://127.0.0.1:5000/classify",
+                corpus = origCorpus,
+                classificationReport = origClassificationReport,
+                owner = ALICE.party,
+                participants = listOf(ALICE.party, BOB.party)
         )
 
         assertEquals(newClassificationReport, model.replaceClassificationReport(newClassificationReport).classificationReport)

@@ -12,6 +12,8 @@ import kotlin.collections.LinkedHashMap
 
 /*********
 @Dev: The Model State Object represents the characteristics commonly found in Machine Learning Models.
+@param algorithm used pertains to the method used to train a model. Ex.: "Naive Bayes"
+@param classificationURL is the enpoint that actually consumes the corpus to produce the classification report
 @param corpus each intent and its relative label -> intent:label.
 @param classificationReport the classification report for each label
 For example:
@@ -27,11 +29,21 @@ For example:
  *********/
 @BelongsToContract(ModelContract::class)
 data class ModelState(
+        val algorithmUsed: String,
+        val classificationURL : String,
         val corpus: LinkedHashMap<String, String>,
-        val classificationReport: Map<String, LinkedHashMap<String, Double>>,
-        val creator: Party,
+        val classificationReport: LinkedHashMap<String, LinkedHashMap<String, Double>>,
+        val owner: Party,
         override val participants: List<Party>,
         override val linearId: UniqueIdentifier = UniqueIdentifier()) : LinearState{
+
+    fun replaceClassificationURL(newURL : String) : ModelState{
+        return copy(classificationURL = newURL)
+    }
+
+    fun replaceOwner(newOwner: Party) : ModelState{
+        return copy(owner = newOwner)
+    }
 
     fun replaceModelCorpus(newCorpus: LinkedHashMap<String, String>) : ModelState{
         return copy(corpus = newCorpus)

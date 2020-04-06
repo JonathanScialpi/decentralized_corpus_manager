@@ -62,9 +62,11 @@ class ModelIssueTests {
     @Test
     fun mustIncludeIssueCommand() {
         val model = ModelState(
+                algorithmUsed = "Passive Aggressive",
+                classificationURL = "http://127.0.0.1:5000/classify",
                 corpus = origCorpus,
                 classificationReport = origClassificationReport,
-                creator = ALICE.party,
+                owner = ALICE.party,
                 participants = listOf(ALICE.party, BOB.party)
         )
         ledgerServices.ledger {
@@ -84,15 +86,19 @@ class ModelIssueTests {
     @Test
     fun mustNotHaveInputStates(){
         val inputModelState = ModelState(
+                algorithmUsed = "Passive Aggressive",
+                classificationURL = "http://127.0.0.1:5000/classify",
                 corpus = origCorpus,
                 classificationReport = origClassificationReport,
-                creator = ALICE.party,
+                owner = ALICE.party,
                 participants = listOf(ALICE.party, BOB.party)
         )
         val outputModelState = ModelState(
+                algorithmUsed = "Passive Aggressive",
+                classificationURL = "http://127.0.0.1:5000/classify",
                 corpus = newCorpus,
                 classificationReport = newClassificationReport,
-                creator = ALICE.party,
+                owner = ALICE.party,
                 participants = listOf(ALICE.party, BOB.party)
         )
         ledgerServices.ledger {
@@ -113,15 +119,19 @@ class ModelIssueTests {
     @Test
     fun mustHaveOneOutputState(){
         val outputModelStateOne = ModelState(
+                algorithmUsed = "Passive Aggressive",
+                classificationURL = "http://127.0.0.1:5000/classify",
                 corpus = origCorpus,
                 classificationReport = origClassificationReport,
-                creator = ALICE.party,
+                owner = ALICE.party,
                 participants = listOf(ALICE.party, BOB.party)
         )
         val outputModelStateTwo = ModelState(
+                algorithmUsed = "Passive Aggressive",
+                classificationURL = "http://127.0.0.1:5000/classify",
                 corpus = newCorpus,
                 classificationReport = newClassificationReport,
-                creator = ALICE.party,
+                owner = ALICE.party,
                 participants = listOf(ALICE.party, BOB.party)
         )
         ledgerServices.ledger {
@@ -142,16 +152,20 @@ class ModelIssueTests {
     @Test
     fun mustHaveAtLeastOneParty(){
         val outputModelStateNoParties = ModelState(
+                algorithmUsed = "Passive Aggressive",
+                classificationURL = "http://127.0.0.1:5000/classify",
                 corpus = newCorpus,
                 classificationReport = newClassificationReport,
-                creator = ALICE.party,
+                owner = ALICE.party,
                 participants = listOf()
         )
 
         val outputModelState = ModelState(
+                algorithmUsed = "Passive Aggressive",
+                classificationURL = "http://127.0.0.1:5000/classify",
                 corpus = newCorpus,
                 classificationReport = newClassificationReport,
-                creator = ALICE.party,
+                owner = ALICE.party,
                 participants = listOf(ALICE.party)
         )
         ledgerServices.ledger {
@@ -173,16 +187,20 @@ class ModelIssueTests {
         var emptyCorpus : LinkedHashMap<String, String> =  LinkedHashMap<String, String>()
 
         val outputModelStateEmptyCorpus = ModelState(
+                algorithmUsed = "Passive Aggressive",
+                classificationURL = "http://127.0.0.1:5000/classify",
                 corpus = emptyCorpus,
                 classificationReport = newClassificationReport,
-                creator = ALICE.party,
+                owner = ALICE.party,
                 participants = listOf(ALICE.party, BOB.party)
         )
 
         val outputModelState = ModelState(
+                algorithmUsed = "Passive Aggressive",
+                classificationURL = "http://127.0.0.1:5000/classify",
                 corpus = newCorpus,
                 classificationReport = newClassificationReport,
-                creator = ALICE.party,
+                owner = ALICE.party,
                 participants = listOf(ALICE.party, BOB.party)
         )
         ledgerServices.ledger {
@@ -204,16 +222,20 @@ class ModelIssueTests {
         var emptyClassificationReport = LinkedHashMap<String, LinkedHashMap<String, Double>>()
 
         val outputModelStateEmptyClassificationReport = ModelState(
+                algorithmUsed = "Passive Aggressive",
+                classificationURL = "http://127.0.0.1:5000/classify",
                 corpus = origCorpus,
                 classificationReport = emptyClassificationReport,
-                creator = ALICE.party,
+                owner = ALICE.party,
                 participants = listOf(ALICE.party, BOB.party)
         )
 
         val outputModelState = ModelState(
+                algorithmUsed = "Passive Aggressive",
+                classificationURL = "http://127.0.0.1:5000/classify",
                 corpus = newCorpus,
                 classificationReport = newClassificationReport,
-                creator = ALICE.party,
+                owner = ALICE.party,
                 participants = listOf(ALICE.party, BOB.party)
         )
         ledgerServices.ledger {
@@ -231,25 +253,29 @@ class ModelIssueTests {
     }
 
     @Test
-    fun creatorMustSign(){
+    fun ownerMustSign(){
         val outputModelStateNoParties = ModelState(
+                algorithmUsed = "Passive Aggressive",
+                classificationURL = "http://127.0.0.1:5000/classify",
                 corpus = newCorpus,
                 classificationReport = newClassificationReport,
-                creator = ALICE.party,
+                owner = ALICE.party,
                 participants = listOf(ALICE.party, BOB.party)
         )
 
         val outputModelState = ModelState(
+                algorithmUsed = "Passive Aggressive",
+                classificationURL = "http://127.0.0.1:5000/classify",
                 corpus = newCorpus,
                 classificationReport = newClassificationReport,
-                creator = ALICE.party,
+                owner = ALICE.party,
                 participants = listOf(ALICE.party)
         )
         ledgerServices.ledger {
             transaction {
                 output(ModelContract.ID,  outputModelStateNoParties)
                 command(listOf(BOB.publicKey),  ModelContract.Commands.Issue())
-                this `fails with` "The creator must be included in the list of signers."
+                this `fails with` "The owner must be included in the list of signers."
             }
             transaction {
                 output(ModelContract.ID, outputModelState)
