@@ -3,7 +3,6 @@ package com.dcm.flow
 import com.dcm.flows.IssueModelFlow
 import com.dcm.flows.ModelIssueFlowResponder
 import com.dcm.flows.TransferOwnershipFlow
-import com.dcm.flows.UpdateCorpus
 import com.dcm.states.ModelState
 import net.corda.core.contracts.TransactionVerificationException
 import net.corda.core.identity.CordaX500Name

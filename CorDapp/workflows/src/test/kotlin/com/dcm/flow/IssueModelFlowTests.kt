@@ -5,11 +5,9 @@ import com.dcm.flows.IssueModelFlow
 import com.dcm.flows.ModelIssueFlowResponder
 import com.dcm.states.ModelState
 import com.google.gson.JsonSyntaxException
-import net.corda.core.contracts.TransactionVerificationException
 import net.corda.core.identity.CordaX500Name
 import net.corda.core.transactions.SignedTransaction
 import net.corda.core.utilities.getOrThrow
-import net.corda.finance.POUNDS
 import net.corda.testing.internal.chooseIdentityAndCert
 import net.corda.testing.node.MockNetwork
 import net.corda.testing.node.MockNetworkNotarySpec

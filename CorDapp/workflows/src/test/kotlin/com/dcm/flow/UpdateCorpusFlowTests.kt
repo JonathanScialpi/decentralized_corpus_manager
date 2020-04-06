@@ -1,13 +1,11 @@
 package com.dcm.flow
 
-import com.dcm.contract.ModelContract
 import com.dcm.flows.IssueModelFlow
 import com.dcm.flows.ModelIssueFlowResponder
-import com.dcm.flows.UpdateCorpus
+import com.dcm.flows.UpdateCorpusFlow
 import com.dcm.states.ModelState
 import net.corda.core.contracts.TransactionVerificationException
 import net.corda.core.identity.CordaX500Name
-import net.corda.core.transactions.SignedTransaction
 import net.corda.core.utilities.getOrThrow
 import net.corda.testing.internal.chooseIdentityAndCert
 import net.corda.testing.node.MockNetwork
@@ -186,7 +184,7 @@ class UpdateCorpusFlowTests {
         mockNetwork.runNetwork()
 
         val origModel = future.getOrThrow().tx.outputs.single().data as ModelState
-        val flowTwo = UpdateCorpus(
+        val flowTwo = UpdateCorpusFlow(
                 proposedCorpus = newCorpus,
                 modelLinearId = origModel.linearId
         )
@@ -209,7 +207,7 @@ class UpdateCorpusFlowTests {
         mockNetwork.runNetwork()
 
         val origModel = future.getOrThrow().tx.outputs.single().data as ModelState
-        val flowTwo = UpdateCorpus(
+        val flowTwo = UpdateCorpusFlow(
                 proposedCorpus = origCorpus,
                 modelLinearId = origModel.linearId
         )

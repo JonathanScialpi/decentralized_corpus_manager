@@ -3,21 +3,13 @@ package com.dcm.flows
 import co.paralleluniverse.fibers.Suspendable
 import com.dcm.contract.ModelContract
 import com.dcm.states.ModelState
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
-import net.corda.core.contracts.Requirements.using
 import net.corda.core.contracts.UniqueIdentifier
 import net.corda.core.contracts.requireThat
 import net.corda.core.flows.*
-import net.corda.core.identity.Party
 import net.corda.core.node.services.queryBy
 import net.corda.core.node.services.vault.QueryCriteria
 import net.corda.core.transactions.SignedTransaction
 import net.corda.core.transactions.TransactionBuilder
-import okhttp3.MediaType
-import okhttp3.OkHttpClient
-import okhttp3.Request
-import okhttp3.RequestBody
 
 @InitiatingFlow
 @StartableByRPC
