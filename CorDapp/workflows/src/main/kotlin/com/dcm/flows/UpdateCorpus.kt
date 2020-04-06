@@ -8,16 +8,18 @@ import com.google.gson.reflect.TypeToken
 import net.corda.core.contracts.UniqueIdentifier
 import net.corda.core.contracts.requireThat
 import net.corda.core.flows.*
-import net.corda.core.identity.Party
 import net.corda.core.node.services.queryBy
 import net.corda.core.node.services.vault.QueryCriteria
 import net.corda.core.transactions.SignedTransaction
 import net.corda.core.transactions.TransactionBuilder
-import okhttp3.*
+import okhttp3.MediaType
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.RequestBody
 
 @InitiatingFlow
 @StartableByRPC
-class UpdateCorpus(
+class UpdateCorpusFlow(
         private val proposedCorpus: LinkedHashMap<String, String>,
         private val modelLinearId: UniqueIdentifier
 ): FlowLogic<SignedTransaction>() {
@@ -63,7 +65,7 @@ class UpdateCorpus(
     }
 }
 
-@InitiatedBy(UpdateCorpus::class)
+@InitiatedBy(UpdateCorpusFlow::class)
 class UpdateCorpusResponder(val counterpartySession: FlowSession): FlowLogic<SignedTransaction>() {
 
     @Suspendable

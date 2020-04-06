@@ -2,11 +2,11 @@ package net.corda.training.com.dcm.state
 
 import com.dcm.states.ModelState
 import net.corda.core.contracts.UniqueIdentifier
-import org.junit.Test
-import kotlin.test.assertEquals
 import net.corda.training.ALICE
 import net.corda.training.BOB
 import org.junit.Before
+import org.junit.Test
+import kotlin.test.assertEquals
 
 class ModelStateTests {
     private var origClassificationReport = LinkedHashMap<String, LinkedHashMap<String, Double>>()

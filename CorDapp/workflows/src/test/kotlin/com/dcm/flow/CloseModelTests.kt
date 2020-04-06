@@ -5,7 +5,6 @@ import com.dcm.flows.IssueModelFlow
 import com.dcm.flows.ModelIssueFlowResponder
 import com.dcm.flows.UpdateClassificationURL
 import com.dcm.states.ModelState
-import net.corda.core.contracts.TransactionVerificationException
 import net.corda.core.identity.CordaX500Name
 import net.corda.core.utilities.getOrThrow
 import net.corda.testing.internal.chooseIdentityAndCert
