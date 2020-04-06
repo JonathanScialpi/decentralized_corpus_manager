@@ -19,7 +19,7 @@ import org.junit.Before
 import org.junit.Test
 import kotlin.test.assertFailsWith
 
-class ModelUpdateFlowTests {
+class UpdateCorpusFlowTests {
     private lateinit var mockNetwork: MockNetwork
     private lateinit var a: StartedMockNode
     private lateinit var b: StartedMockNode
@@ -177,6 +177,8 @@ class ModelUpdateFlowTests {
         val creator = a.info.chooseIdentityAndCert().party
         val otherParty = b.info.chooseIdentityAndCert().party
         val flow = IssueModelFlow(
+                algorithmUsed = "Passive Aggressive",
+                classificationURL = "http://127.0.0.1:5000/classify",
                 corpus = origCorpus,
                 participants = listOf(creator, otherParty)
         )
@@ -198,6 +200,8 @@ class ModelUpdateFlowTests {
         val creator = a.info.chooseIdentityAndCert().party
         val otherParty = b.info.chooseIdentityAndCert().party
         val flow = IssueModelFlow(
+                algorithmUsed = "Passive Aggressive",
+                classificationURL = "http://127.0.0.1:5000/classify",
                 corpus = newCorpus,
                 participants = listOf(creator, otherParty)
         )

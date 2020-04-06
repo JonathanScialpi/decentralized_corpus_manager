@@ -40,7 +40,7 @@ class UpdateCorpus(
         val corpusJson =  Gson().toJson(payload)
         val body = RequestBody.create(json, corpusJson)
         val request = Request.Builder()
-                .url(CLASSIFY_URL)
+                .url(inputModelState.classificationURL)
                 .post(body)
                 .build()
         var response = OkHttpClient().newCall(request).execute()

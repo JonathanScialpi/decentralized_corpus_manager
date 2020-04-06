@@ -17,12 +17,12 @@ import net.corda.core.transactions.SignedTransaction
 import net.corda.core.transactions.TransactionBuilder
 import okhttp3.*
 
-const val CLASSIFY_URL = "http://127.0.0.1:5000/classify"
-
 @InitiatingFlow
 @StartableByRPC
 
 class IssueModelFlow(
+        private val algorithmUsed : String,
+        private val classificationURL : String,
         private val corpus: LinkedHashMap<String, String>,
         private val participants : List<Party>
 ): FlowLogic<SignedTransaction>() {
@@ -38,7 +38,7 @@ class IssueModelFlow(
         val corpusJson =  Gson().toJson(payload)
         val body = RequestBody.create(json, corpusJson)
         val request = Request.Builder()
-                .url(CLASSIFY_URL)
+                .url(classificationURL)
                 .post(body)
                 .build()
         var response = OkHttpClient().newCall(request).execute()
@@ -47,7 +47,13 @@ class IssueModelFlow(
         response = null
 
         // finish building tx
-        val outputModelState = ModelState(corpus, classificationReport, ourIdentity, participants)
+        val outputModelState = ModelState(
+                algorithmUsed,
+                classificationURL,
+                corpus,
+                classificationReport,
+                ourIdentity,
+                participants)
         val commandData = ModelContract.Commands.Issue()
         transactionBuilder.addCommand(commandData, participants.map { it.owningKey })
         transactionBuilder.addOutputState(outputModelState, ModelContract.ID)
