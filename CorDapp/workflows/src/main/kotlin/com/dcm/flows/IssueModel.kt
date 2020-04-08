@@ -22,7 +22,7 @@ class IssueModelFlow(
         private val algorithmUsed : String,
         private val classificationURL : String,
         private val corpus: LinkedHashMap<String, String>,
-        private val participants : List<Party>
+        private var participants : List<Party>
 ): FlowLogic<SignedTransaction>() {
     @Suspendable
     override fun call(): SignedTransaction{
@@ -54,7 +54,7 @@ class IssueModelFlow(
                 ourIdentity,
                 participants)
         val commandData = ModelContract.Commands.Issue()
-        transactionBuilder.addCommand(commandData, participants.map { it.owningKey })
+        transactionBuilder.addCommand(commandData, participants.plus(ourIdentity).map { it.owningKey })
         transactionBuilder.addOutputState(outputModelState, ModelContract.ID)
         transactionBuilder.verify(serviceHub)
 
