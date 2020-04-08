@@ -54,7 +54,7 @@ class IssueModelFlow(
                 ourIdentity,
                 participants)
         val commandData = ModelContract.Commands.Issue()
-        transactionBuilder.addCommand(commandData, participants.map { it.owningKey })
+        transactionBuilder.addCommand(commandData, participants.plus(ourIdentity).map { it.owningKey })
         transactionBuilder.addOutputState(outputModelState, ModelContract.ID)
         transactionBuilder.verify(serviceHub)
 

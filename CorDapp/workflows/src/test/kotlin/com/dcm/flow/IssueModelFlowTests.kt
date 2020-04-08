@@ -120,7 +120,7 @@ class IssueModelFlowTests {
                 algorithmUsed = "Passive Aggressive",
                 classificationURL = "http://127.0.0.1:5000/classify",
                 corpus = newCorpus,
-                participants = listOf(creator, otherParty)
+                participants = listOf(otherParty)
         )
         val future = a.startFlow(flow)
         mockNetwork.runNetwork()
@@ -151,7 +151,7 @@ class IssueModelFlowTests {
                 algorithmUsed = "Passive Aggressive",
                 classificationURL = "http://127.0.0.1:5000/classify",
                 corpus = emptyCorpus,
-                participants = listOf(creator, otherParty)
+                participants = listOf(otherParty)
         )
         val futureOne = a.startFlow(emptyCorpusFlow)
         mockNetwork.runNetwork()
@@ -162,7 +162,7 @@ class IssueModelFlowTests {
                 algorithmUsed = "Passive Aggressive",
                 classificationURL = "http://127.0.0.1:5000/classify",
                 corpus = newCorpus,
-                participants = listOf(creator, otherParty)
+                participants = listOf(otherParty)
         ))
         mockNetwork.runNetwork()
         futureTwo.getOrThrow()
@@ -176,7 +176,7 @@ class IssueModelFlowTests {
                 algorithmUsed = "Passive Aggressive",
                 classificationURL = "http://127.0.0.1:5000/classify",
                 corpus = newCorpus,
-                participants = listOf(creator, otherParty)
+                participants = listOf(otherParty)
         )
         val future = a.startFlow(flow)
         mockNetwork.runNetwork()
@@ -192,7 +192,7 @@ class IssueModelFlowTests {
                 algorithmUsed = "Passive Aggressive",
                 classificationURL = "http://127.0.0.1:5000/classify",
                 corpus = newCorpus,
-                participants = listOf(creator, otherParty)
+                participants = listOf(otherParty)
         )
         val future = a.startFlow(flow)
         mockNetwork.runNetwork()
