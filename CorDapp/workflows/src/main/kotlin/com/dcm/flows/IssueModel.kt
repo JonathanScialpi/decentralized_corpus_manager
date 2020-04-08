@@ -22,7 +22,7 @@ class IssueModelFlow(
         private val algorithmUsed : String,
         private val classificationURL : String,
         private val corpus: LinkedHashMap<String, String>,
-        private var participants : List<Party>
+        private val participants : List<Party>
 ): FlowLogic<SignedTransaction>() {
     @Suspendable
     override fun call(): SignedTransaction{
