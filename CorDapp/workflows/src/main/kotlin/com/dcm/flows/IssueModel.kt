@@ -46,6 +46,7 @@ class IssueModelFlow(
 
         // finish building tx
         val outputModelState = ModelState(
+                "Open",
                 algorithmUsed,
                 classificationURL,
                 corpus,

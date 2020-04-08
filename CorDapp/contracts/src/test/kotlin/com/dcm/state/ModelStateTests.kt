@@ -56,6 +56,9 @@ class ModelStateTests {
 
     @Test
     fun hasAllFieldsAndProperTypes(){
+        ModelState::class.java.getDeclaredField("status")
+        assertEquals(ModelState::class.java.getDeclaredField("status").type, String::class.java)
+
         ModelState::class.java.getDeclaredField("algorithmUsed")
         assertEquals(ModelState::class.java.getDeclaredField("algorithmUsed").type, String::class.java)
 
@@ -78,6 +81,7 @@ class ModelStateTests {
     @Test
     fun checkReplaceModelCorpus(){
         val model = ModelState(
+                status = "Open",
                 algorithmUsed = "Passive Aggressive",
                 classificationURL = "http://127.0.0.1:5000/classify",
                 corpus = origCorpus,
@@ -92,6 +96,7 @@ class ModelStateTests {
     @Test
     fun checkReplaceModelClassificationReport(){
         val model = ModelState(
+                status = "Open",
                 algorithmUsed = "Passive Aggressive",
                 classificationURL = "http://127.0.0.1:5000/classify",
                 corpus = origCorpus,

@@ -62,6 +62,7 @@ class ModelIssueTests {
     @Test
     fun mustIncludeIssueCommand() {
         val model = ModelState(
+                status = "Open",
                 algorithmUsed = "Passive Aggressive",
                 classificationURL = "http://127.0.0.1:5000/classify",
                 corpus = origCorpus,
@@ -86,6 +87,7 @@ class ModelIssueTests {
     @Test
     fun mustNotHaveInputStates(){
         val inputModelState = ModelState(
+                status = "Open",
                 algorithmUsed = "Passive Aggressive",
                 classificationURL = "http://127.0.0.1:5000/classify",
                 corpus = origCorpus,
@@ -94,6 +96,7 @@ class ModelIssueTests {
                 participants = listOf(ALICE.party, BOB.party)
         )
         val outputModelState = ModelState(
+                status = "Open",
                 algorithmUsed = "Passive Aggressive",
                 classificationURL = "http://127.0.0.1:5000/classify",
                 corpus = newCorpus,
@@ -119,6 +122,7 @@ class ModelIssueTests {
     @Test
     fun mustHaveOneOutputState(){
         val outputModelStateOne = ModelState(
+                status = "Open",
                 algorithmUsed = "Passive Aggressive",
                 classificationURL = "http://127.0.0.1:5000/classify",
                 corpus = origCorpus,
@@ -127,6 +131,7 @@ class ModelIssueTests {
                 participants = listOf(ALICE.party, BOB.party)
         )
         val outputModelStateTwo = ModelState(
+                status = "Open",
                 algorithmUsed = "Passive Aggressive",
                 classificationURL = "http://127.0.0.1:5000/classify",
                 corpus = newCorpus,
@@ -152,6 +157,7 @@ class ModelIssueTests {
     @Test
     fun mustHaveAtLeastOneParty(){
         val outputModelStateNoParties = ModelState(
+                status = "Open",
                 algorithmUsed = "Passive Aggressive",
                 classificationURL = "http://127.0.0.1:5000/classify",
                 corpus = newCorpus,
@@ -161,6 +167,7 @@ class ModelIssueTests {
         )
 
         val outputModelState = ModelState(
+                status = "Open",
                 algorithmUsed = "Passive Aggressive",
                 classificationURL = "http://127.0.0.1:5000/classify",
                 corpus = newCorpus,
@@ -187,6 +194,7 @@ class ModelIssueTests {
         var emptyCorpus : LinkedHashMap<String, String> =  LinkedHashMap<String, String>()
 
         val outputModelStateEmptyCorpus = ModelState(
+                status = "Open",
                 algorithmUsed = "Passive Aggressive",
                 classificationURL = "http://127.0.0.1:5000/classify",
                 corpus = emptyCorpus,
@@ -196,6 +204,7 @@ class ModelIssueTests {
         )
 
         val outputModelState = ModelState(
+                status = "Open",
                 algorithmUsed = "Passive Aggressive",
                 classificationURL = "http://127.0.0.1:5000/classify",
                 corpus = newCorpus,
@@ -222,6 +231,7 @@ class ModelIssueTests {
         var emptyClassificationReport = LinkedHashMap<String, LinkedHashMap<String, Double>>()
 
         val outputModelStateEmptyClassificationReport = ModelState(
+                status = "Open",
                 algorithmUsed = "Passive Aggressive",
                 classificationURL = "http://127.0.0.1:5000/classify",
                 corpus = origCorpus,
@@ -231,6 +241,7 @@ class ModelIssueTests {
         )
 
         val outputModelState = ModelState(
+                status = "Open",
                 algorithmUsed = "Passive Aggressive",
                 classificationURL = "http://127.0.0.1:5000/classify",
                 corpus = newCorpus,
@@ -255,6 +266,7 @@ class ModelIssueTests {
     @Test
     fun ownerMustSign(){
         val outputModelStateNoParties = ModelState(
+                status = "Open",
                 algorithmUsed = "Passive Aggressive",
                 classificationURL = "http://127.0.0.1:5000/classify",
                 corpus = newCorpus,
@@ -264,6 +276,7 @@ class ModelIssueTests {
         )
 
         val outputModelState = ModelState(
+                status = "Open",
                 algorithmUsed = "Passive Aggressive",
                 classificationURL = "http://127.0.0.1:5000/classify",
                 corpus = newCorpus,
