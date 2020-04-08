@@ -2,6 +2,7 @@ package com.dcm.contract
 
 import com.dcm.states.ModelState
 import net.corda.core.contracts.*
+import net.corda.core.contracts.Requirements.using
 import net.corda.core.transactions.LedgerTransaction
 import java.security.PublicKey
 
@@ -16,6 +17,7 @@ class ModelContract: Contract {
         class UpdateCorpus : TypeOnlyCommandData(), Commands
         class TransferOwnership : TypeOnlyCommandData(), Commands
         class UpdateClassifcationEndpoint : TypeOnlyCommandData(), Commands
+        class SetClosedStatus : TypeOnlyCommandData(), Commands
         class CloseModel : TypeOnlyCommandData(), Commands
     }
     override fun verify(tx: LedgerTransaction) {
@@ -29,6 +31,7 @@ class ModelContract: Contract {
                 "The corpus cannot be empty." using (model.corpus.isNotEmpty())
                 "The classification report cannot be empty." using(model.classificationReport.isNotEmpty())
                 "The owner must be included in the list of signers." using (model.owner.owningKey in command.signers)
+                "The proposed state status must be 'Open'" using (model.status == "Open")
             }
 
             is Commands.UpdateCorpus -> requireThat {
@@ -49,6 +52,8 @@ class ModelContract: Contract {
                 "The owner cannot change during a corpus update." using (input.owner.owningKey  == output.owner.owningKey)
                 "The algorithm used cannot change during a corpus update." using (input.algorithmUsed  == output.algorithmUsed)
                 "The owner must be included in the list of signers." using (output.owner.owningKey in command.signers)
+                "The current status must be 'Open'" using (input.status == "Open")
+                "The proposed state status must be 'Open'" using (output.status == "Open")
             }
 
             is Commands.TransferOwnership -> requireThat{
@@ -62,6 +67,8 @@ class ModelContract: Contract {
                 "The algorithm used cannot change during a corpus update." using (input.algorithmUsed == output.algorithmUsed)
                 "The classification URL cannot change during a corpus update." using (input.classificationURL  == output.classificationURL)
                 "The previous owner must be included in the list of signers." using (input.owner.owningKey in command.signers)
+                "The current status must be 'Open'" using (input.status == "Open")
+                "The proposed state status must be 'Open'" using (output.status == "Open")
             }
 
             is Commands.UpdateClassifcationEndpoint -> requireThat {
@@ -75,6 +82,23 @@ class ModelContract: Contract {
                 "You cannot change the owner of a model during an endpoint update" using (input.owner.owningKey == output.owner.owningKey)
                 "The classification URL cannot be the same as the input state's." using (input.classificationURL  != output.classificationURL)
                 "The previous owner must be included in the list of signers." using (input.owner.owningKey in command.signers)
+                "The current status must be 'Open'" using (input.status == "Open")
+                "The proposed state status must be 'Open'" using (output.status == "Open")
+            }
+
+            is Commands.SetClosedStatus -> {
+                "One input state must be consumed when closing a model." using (tx.inputs.size == 1)
+                "One output state must be created when closing a model." using (tx.outputs.size == 1)
+                val input = tx.inputsOfType<ModelState>().single()
+                val output = tx.outputsOfType<ModelState>().single()
+                "The owner must be included in the list of signers." using (input.owner.owningKey in command.signers)
+                "The current status must be 'Open'" using (input.status == "Open")
+                "The proposed status must be 'Closed'" using (output.status == "Closed")
+                "The algorithm used cannot change during an endpoint update." using (input.algorithmUsed == output.algorithmUsed)
+                "You cannot change the model corpus during an endpoint update." using (input.corpus == output.corpus)
+                "You cannot change the classification report while updating the classification endpoint." using (input.classificationReport == output.classificationReport)
+                "You cannot change the owner of a model during an endpoint update." using (input.owner.owningKey == output.owner.owningKey)
+                "You cannot change the classificationURL." using (input.classificationURL == output.classificationURL)
             }
 
             is Commands.CloseModel -> requireThat {
@@ -82,6 +106,7 @@ class ModelContract: Contract {
                 "No output states must be created when closing a model." using (tx.outputs.isEmpty())
                 val input = tx.inputsOfType<ModelState>().single()
                 "The owner must be included in the list of signers." using (input.owner.owningKey in command.signers)
+                "The input state's status must be 'Closed'" using (input.status == "Closed")
             }
         }
     }

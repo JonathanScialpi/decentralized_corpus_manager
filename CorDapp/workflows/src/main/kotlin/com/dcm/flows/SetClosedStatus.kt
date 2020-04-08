@@ -3,44 +3,34 @@ package com.dcm.flows
 import co.paralleluniverse.fibers.Suspendable
 import com.dcm.contract.ModelContract
 import com.dcm.states.ModelState
-import net.corda.core.contracts.UniqueIdentifier
+import net.corda.core.contracts.StateAndRef
 import net.corda.core.contracts.requireThat
 import net.corda.core.flows.*
-import net.corda.core.node.services.queryBy
-import net.corda.core.node.services.vault.QueryCriteria
 import net.corda.core.transactions.SignedTransaction
 import net.corda.core.transactions.TransactionBuilder
 
 @InitiatingFlow
 @StartableByRPC
 
-class CloseModelFlow(
-private val modelLinearId: UniqueIdentifier
+class SetClosedStatusFlow(private val modelStateAndRef : StateAndRef<ModelState>) : FlowLogic<SignedTransaction>() {
 
-): FlowLogic<SignedTransaction>() {
     @Suspendable
     override fun call(): SignedTransaction {
-
         val notary = serviceHub.networkMapCache.notaryIdentities.first()
         val transactionBuilder = TransactionBuilder(notary)
 
-        // get current model state and use as input state
-        val queryCriteria = QueryCriteria.LinearStateQueryCriteria(linearId = listOf(modelLinearId))
-        val modelStateAndRef =  serviceHub.vaultService.queryBy<ModelState>(queryCriteria).states.single()
-
-        //set model status to closed before exiting the state
-        subFlow(SetClosedStatusFlow(modelStateAndRef))
-        val newModelStateAndRef =  serviceHub.vaultService.queryBy<ModelState>(queryCriteria).states.single()
-        transactionBuilder.addInputState(newModelStateAndRef)
-        val inputModelState = newModelStateAndRef.state.data
+        transactionBuilder.addInputState(modelStateAndRef)
+        val inputModelState = modelStateAndRef.state.data
 
         if(ourIdentity != inputModelState.owner){
-            throw IllegalArgumentException("Only the owner can close a model.")
+            throw IllegalArgumentException("Only the owner can set the status of a model to 'Closed'.")
         }
 
-        // finish building tx without an output state so we can exit the state
-        val commandData = ModelContract.Commands.CloseModel()
+        // finish building tx
+        val outputModelState = inputModelState.setClosedStatus()
+        val commandData = ModelContract.Commands.SetClosedStatus()
         transactionBuilder.addCommand(commandData, inputModelState.participants.map { it.owningKey })
+        transactionBuilder.addOutputState(outputModelState, ModelContract.ID)
         transactionBuilder.verify(serviceHub)
 
         // sign and get other signatures
@@ -51,19 +41,20 @@ private val modelLinearId: UniqueIdentifier
     }
 
 
-}
-
-@InitiatedBy(CloseModelFlow::class)
-class CloseModelFlowResponder(val counterpartySession: FlowSession): FlowLogic<SignedTransaction>() {
+@InitiatedBy(SetClosedStatusFlow::class)
+class SetClosedStatusResponder(val counterpartySession: FlowSession): FlowLogic<SignedTransaction>() {
 
     @Suspendable
     override fun call(): SignedTransaction {
         val signedTransactionFlow = object : SignTransactionFlow(counterpartySession) {
             override fun checkTransaction(stx: SignedTransaction) = requireThat {
+                val output = stx.tx.outputs.single().data
+                "This must be an Model State transaction" using (output is ModelState)
             }
         }
 
         val txWeJustSignedId = subFlow(signedTransactionFlow)
         return subFlow(ReceiveFinalityFlow(otherSideSession = counterpartySession, expectedTxId = txWeJustSignedId.id))
     }
+}
 }

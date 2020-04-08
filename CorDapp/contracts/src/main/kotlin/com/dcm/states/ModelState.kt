@@ -29,6 +29,7 @@ For example:
  *********/
 @BelongsToContract(ModelContract::class)
 data class ModelState(
+        val status: String,
         val algorithmUsed: String,
         val classificationURL : String,
         val corpus: LinkedHashMap<String, String>,
@@ -36,6 +37,10 @@ data class ModelState(
         val owner: Party,
         override val participants: List<Party>,
         override val linearId: UniqueIdentifier = UniqueIdentifier()) : LinearState{
+
+    fun setClosedStatus(): ModelState{
+        return copy(status = "Closed")
+    }
 
     fun replaceClassificationURL(newURL : String) : ModelState{
         return copy(classificationURL = newURL)
