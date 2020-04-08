@@ -3,14 +3,12 @@ package com.dcm.webserver
 import com.dcm.flows.*
 import com.dcm.states.ModelState
 import com.fasterxml.jackson.annotation.JsonCreator
-import net.corda.core.contracts.Contract
-import net.corda.core.contracts.ContractState
+import com.google.gson.Gson
 import net.corda.core.contracts.LinearState
 import net.corda.core.contracts.UniqueIdentifier
 import net.corda.core.identity.CordaX500Name
 import net.corda.core.identity.Party
 import net.corda.core.messaging.startFlow
-import net.corda.core.messaging.vaultQueryBy
 import net.corda.core.node.services.vault.QueryCriteria
 import org.slf4j.LoggerFactory
 import org.springframework.http.ResponseEntity
@@ -32,7 +30,7 @@ class Controller(rpc: NodeRPCConnection) {
 
     private val proxy = rpc.proxy
 
-    // A simple endpoint to make sure that the server is up and running
+    // @DEV: A simple endpoint to make sure that the server is up and running
     @GetMapping(value = ["/status"])
     private fun isAlive() = "Up and running!"
 
@@ -43,10 +41,14 @@ class Controller(rpc: NodeRPCConnection) {
             val participants : String
     )
 
-    // Create a model using a LinkedHashMap of String to String. They Keys of the map represent data rows while the
-    // values represent their labels.
+    // @DEV: An endpoint to issue a model using JSON.
+    // @Param: corpus is a LinkedHashMap<String, String> where the Key is the data row and the value is the
+    // @Param: algorithmUsed is a String describing the type of algo used to produce the model
+    // @Param: classificationURL is a String which represents the Flask endpoint where the classification report can be
+    // created from.
+    // @Param: participants is the list (Strings) of CordaX500 names for each party included on the TX.
     @RequestMapping(value = "/issueModel", method = [RequestMethod.POST])
-    private fun issueModel(@RequestBody newModel : ModelObj): ResponseEntity<Any?>{
+    private fun issueModel(@RequestBody newModel : ModelObj): ResponseEntity<String?>{
         val result = proxy.startFlow(
                 ::IssueModelFlow,
                 newModel.algorithmUsed,
@@ -60,10 +62,10 @@ class Controller(rpc: NodeRPCConnection) {
         responseMap["classificationURL"] = model.classificationURL
         responseMap["corpus"] = model.corpus
         responseMap["classificationReport"] = model.classificationReport
-        responseMap["owner"] = model.owner
-        responseMap["participants"] = model.participants
+        responseMap["owner"] = model.owner.toString()
+        responseMap["participants"] = model.participants.toString()
         responseMap["LinearID"] = model.linearId
-        return ResponseEntity.ok(responseMap.toString())
+        return ResponseEntity.ok(Gson().toJson(responseMap))
     }
 
     data class CorpusObj @JsonCreator constructor(
@@ -71,9 +73,12 @@ class Controller(rpc: NodeRPCConnection) {
             val modelLinearId: String
     )
 
-    // An endpoint that allows a user to propose a new corpus for the model with the intent to improve it.
+    // @DEV: An endpoint that allows a user to propose a new corpus for the model with the intent to improve it.
+    // @Param: proposedCorpus is a LinkedHashMap<String, String> where the Key is the data row and the value is the
+    // label.
+    // @Param: modelLinearId is the LinearPointer used to query for the model state.
     @RequestMapping(value = "/updateCorpus", method = [RequestMethod.POST])
-    private fun updateCorpus(@RequestBody updatedCorpus : CorpusObj): ResponseEntity<Any?>{
+    private fun updateCorpus(@RequestBody updatedCorpus : CorpusObj): ResponseEntity<String?>{
         val result = proxy.startFlow(
                 ::UpdateCorpusFlow,
                 updatedCorpus.proposedCorpus,
@@ -86,10 +91,10 @@ class Controller(rpc: NodeRPCConnection) {
         responseMap["classificationURL"] = model.classificationURL
         responseMap["corpus"] = model.corpus
         responseMap["classificationReport"] = model.classificationReport
-        responseMap["owner"] = model.owner
-        responseMap["participants"] = model.participants
+        responseMap["owner"] = model.owner.toString()
+        responseMap["participants"] = model.participants.toString()
         responseMap["LinearID"] = model.linearId
-        return ResponseEntity.ok(responseMap.toString())
+        return ResponseEntity.ok(Gson().toJson(responseMap))
     }
 
     data class ClassificationURLObj @JsonCreator constructor(
@@ -97,9 +102,11 @@ class Controller(rpc: NodeRPCConnection) {
             val modelLinearId: String
     )
 
-    // An endpoint for strictly modifying the URL that is used to build the classification report.
+    // @DEV: An endpoint for strictly modifying the URL that is used to build the classification report.
+    // @Param: newURL is a String representing the new endpoint used to produce the classification report.
+    // @Param: modelLinearId is the LinearPointer used to query for the model state.
     @RequestMapping(value = "/updateClassificationURL", method = [RequestMethod.POST])
-    private fun updateClassificationEndpoint(@RequestBody updatedURL : ClassificationURLObj): ResponseEntity<Any?>{
+    private fun updateClassificationEndpoint(@RequestBody updatedURL : ClassificationURLObj): ResponseEntity<String?>{
         val result = proxy.startFlow(
                 ::UpdateClassificationURL,
                 updatedURL.newURL,
@@ -112,10 +119,10 @@ class Controller(rpc: NodeRPCConnection) {
         responseMap["classificationURL"] = model.classificationURL
         responseMap["corpus"] = model.corpus
         responseMap["classificationReport"] = model.classificationReport
-        responseMap["owner"] = model.owner
-        responseMap["participants"] = model.participants
+        responseMap["owner"] = model.owner.toString()
+        responseMap["participants"] = model.participants.toString()
         responseMap["LinearID"] = model.linearId
-        return ResponseEntity.ok(responseMap.toString())
+        return ResponseEntity.ok(Gson().toJson(responseMap))
     }
 
     data class OwnershipObj @JsonCreator constructor(
@@ -123,10 +130,12 @@ class Controller(rpc: NodeRPCConnection) {
             val modelLinearId: String
     )
 
-    // Only the owner of a model can "close" it or update its classification URL. This endpoint allows an owner to
-    // re-assign the ownership of a model.
+    // @DEV: Only the owner of a model can "close" it or update its classification URL. This endpoint allows an owner
+    // to re-assign the ownership of a model.
+    // @Param: newOwner is the party representing the new owner of the model.
+    // @Param: modelLinearId is the LinearPointer used to query for the model state.
     @RequestMapping(value = "/transferOwnership", method = [RequestMethod.POST])
-    private fun transferOwnership(@RequestBody updatedOwner : OwnershipObj): ResponseEntity<Any?>{
+    private fun transferOwnership(@RequestBody updatedOwner : OwnershipObj): ResponseEntity<String?>{
         val result = proxy.startFlow(
                 ::TransferOwnershipFlow,
                 proxy.wellKnownPartyFromX500Name(CordaX500Name.parse(updatedOwner.newOwner)) as Party,
@@ -139,19 +148,20 @@ class Controller(rpc: NodeRPCConnection) {
         responseMap["classificationURL"] = model.classificationURL
         responseMap["corpus"] = model.corpus
         responseMap["classificationReport"] = model.classificationReport
-        responseMap["owner"] = model.owner
-        responseMap["participants"] = model.participants
+        responseMap["owner"] = model.owner.toString()
+        responseMap["participants"] = model.participants.toString()
         responseMap["LinearID"] = model.linearId
-        return ResponseEntity.ok(responseMap.toString())
+        return ResponseEntity.ok(Gson().toJson(responseMap))
     }
 
     data class ModelLinearId @JsonCreator constructor(
             val modelLinearId: String
     )
 
-    // Prevent any further changes to a model by pointing to the exit state.
+    // @DEV: An endpoint for the model owner to prevent any further changes to a model by pointing to the exit state.
+    // @Param: modelLinearId is the LinearPointer used to query for the model state.
     @RequestMapping(value = "/closeModel", method = [RequestMethod.POST])
-    private fun closeModel(@RequestBody modelLinearId : ModelLinearId): ResponseEntity<Any?>{
+    private fun closeModel(@RequestBody modelLinearId : ModelLinearId): ResponseEntity<String?>{
         val result = proxy.startFlow(
                 ::CloseModelFlow,
                 UniqueIdentifier.fromString(modelLinearId.modelLinearId)
@@ -162,10 +172,10 @@ class Controller(rpc: NodeRPCConnection) {
         responseMap["classificationURL"] = model.classificationURL
         responseMap["corpus"] = model.corpus
         responseMap["classificationReport"] = model.classificationReport
-        responseMap["owner"] = model.owner
-        responseMap["participants"] = model.participants
+        responseMap["owner"] = model.owner.toString()
+        responseMap["participants"] = model.participants.toString()
         responseMap["LinearID"] = model.linearId
-        return ResponseEntity.ok(responseMap.toString())
+        return ResponseEntity.ok(Gson().toJson(responseMap))
     }
 
     data class CSVModelObj @JsonCreator constructor(
@@ -174,9 +184,15 @@ class Controller(rpc: NodeRPCConnection) {
             val participants : String
     )
 
-    // The user has the option of using a CSV file delimited by "|" to use as a corpus for model creation.
+    // @DEV: This endpoint gives the user has the option of using a CSV file delimited by "|" to use as a corpus for
+    // model creation.
+    // @Param: csvFile is a multipart file that is a "|" delimited utterance (data|label).
+    // @Param: algorithmUsed is a String describing the type of algo used to produce the model
+    // @Param: classificationURL is a String which represents the Flask endpoint where the classification report can be
+    // created from.
+    // @Param: participants is the list (Strings) of CordaX500 names for each party included on the TX.
     @RequestMapping(value = "/issueModelWithCSV", method = [RequestMethod.POST], consumes = ["multipart/form-data"])
-    open fun importCSV(@Valid @RequestParam("csvFile") multipart: MultipartFile, csvModelObj: CSVModelObj): ResponseEntity<String> {
+    open fun importCSV(@Valid @RequestParam("csvFile") multipart: MultipartFile, csvModelObj: CSVModelObj): ResponseEntity<String?> {
         var corpus = LinkedHashMap<String, String>()
         multipart.inputStream.bufferedReader().use { stream ->
             stream.readLines().map {
@@ -199,15 +215,16 @@ class Controller(rpc: NodeRPCConnection) {
         responseMap["classificationURL"] = model.classificationURL
         responseMap["corpus"] = model.corpus
         responseMap["classificationReport"] = model.classificationReport
-        responseMap["owner"] = model.owner
-        responseMap["participants"] = model.participants
+        responseMap["owner"] = model.owner.toString()
+        responseMap["participants"] = model.participants.toString()
         responseMap["LinearID"] = model.linearId
-        return ResponseEntity.ok(responseMap.toString())
+        return ResponseEntity.ok(Gson().toJson(responseMap))
     }
 
-    // Use a linearId to retrieve the most recent version of a model state.
-    @RequestMapping(value = ["/modelLookup"], produces = ["text/plain"],  method = [RequestMethod.POST])
-    private fun getModelState(modelLinearId : ModelLinearId) : ResponseEntity<String> {
+    // @DEV: Retrieve the most recent version of a model state.
+    // @Param: modelLinearId is the LinearPointer used to query for the model state.
+    @RequestMapping(value = ["/modelLookup"],  method = [RequestMethod.POST],  produces = ["application/json"])
+    private fun getModelState(@RequestBody modelLinearId : ModelLinearId) : ResponseEntity<String?> {
         val queryCriteria = QueryCriteria.LinearStateQueryCriteria(linearId = listOf(UniqueIdentifier.fromString(modelLinearId.modelLinearId)))
         val model = proxy.vaultQueryByCriteria(queryCriteria, LinearState::class.java).states.single().state.data as ModelState
         val responseMap = HashMap<String, Any>()
@@ -215,9 +232,9 @@ class Controller(rpc: NodeRPCConnection) {
         responseMap["classificationURL"] = model.classificationURL
         responseMap["corpus"] = model.corpus
         responseMap["classificationReport"] = model.classificationReport
-        responseMap["owner"] = model.owner
-        responseMap["participants"] = model.participants
+        responseMap["owner"] = model.owner.toString()
+        responseMap["participants"] = model.participants.toString()
         responseMap["LinearID"] = model.linearId
-        return ResponseEntity.ok(responseMap.toString())
+        return ResponseEntity.ok(Gson().toJson(responseMap))
     }
 }
