@@ -1,11 +1,18 @@
 package com.dcm.states
 
 import com.dcm.contract.ModelContract
+import com.dcm.schemas.ModelSchemaV1
+import com.dcm.schemas.PersistentModel
+import com.google.common.collect.ImmutableList
 import net.corda.core.contracts.BelongsToContract
 import net.corda.core.contracts.ContractState
 import net.corda.core.contracts.LinearState
 import net.corda.core.contracts.UniqueIdentifier
 import net.corda.core.identity.Party
+import net.corda.core.schemas.MappedSchema
+import net.corda.core.schemas.PersistentState
+import net.corda.core.schemas.QueryableState
+import java.lang.IllegalArgumentException
 import java.util.*
 import kotlin.collections.HashMap
 import kotlin.collections.LinkedHashMap
@@ -36,7 +43,7 @@ data class ModelState(
         val classificationReport: LinkedHashMap<String, LinkedHashMap<String, Double>>,
         val owner: Party,
         override val participants: List<Party>,
-        override val linearId: UniqueIdentifier = UniqueIdentifier()) : LinearState{
+        override val linearId: UniqueIdentifier = UniqueIdentifier()) : LinearState, QueryableState{
 
     fun setClosedStatus(): ModelState{
         return copy(status = "Closed")
@@ -56,6 +63,26 @@ data class ModelState(
 
     fun replaceClassificationReport( newClassificationReport: LinkedHashMap<String, LinkedHashMap<String, Double>>) : ModelState {
         return copy(classificationReport = newClassificationReport)
+    }
+
+    override fun generateMappedObject(schema: MappedSchema): PersistentState {
+      if(schema is ModelSchemaV1){
+        return PersistentModel(
+          status,
+          algorithmUsed,
+          classificationURL,
+          corpus,
+          classificationReport,
+          owner,
+          linearId
+        )
+      }else{
+        throw IllegalArgumentException("Unsupported Schema")
+      }
+    }
+
+    override fun supportedSchemas(): Iterable<MappedSchema> {
+      return ImmutableList.of(ModelSchemaV1())
     }
 
 }
