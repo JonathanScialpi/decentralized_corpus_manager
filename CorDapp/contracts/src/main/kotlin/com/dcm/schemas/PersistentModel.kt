@@ -1,9 +1,8 @@
 package com.dcm.schemas
 
-import net.corda.core.contracts.UniqueIdentifier
 import net.corda.core.identity.Party
-import java.io.Serializable
 import net.corda.core.schemas.PersistentState
+import java.util.*
 import javax.persistence.Column
 import javax.persistence.Entity
 import javax.persistence.Table
@@ -12,24 +11,24 @@ import javax.persistence.Table
 @Entity
 @Table(name = "MODEL_STATES")
 class PersistentModel(
-  @Column(name = "status")
-  val status: String,
+        @Column(name = "STATUS")
+        val status: String,
 
-  @Column(name = "algorithmUsed")
-  val algorithmUsed: String,
+        @Column(name = "ALGORITHM_USED")
+        val algorithmUsed: String,
 
-  @Column(name = "classificationURL")
-  val classificationURL : String,
+        @Column(name = "CLASSIFICATION_URL")
+        val classificationURL: String,
 
-  @Column(name = "corpus")
-  val corpus: LinkedHashMap<String, String>,
+        @Column(name = "CORPUS_LABELS")
+        val corpus: String,
 
-  @Column(name = "classificationReport")
-  val classificationReport: LinkedHashMap<String, LinkedHashMap<String, Double>>,
+        @Column(name = "ACCURACY")
+        val accuracy: Double?,
 
-  @Column(name = "owner")
-  val owner: Party,
+        @Column(name = "OWNER")
+        val owner: Party,
 
-  @Column(name = "linearId")
-  val linearId: UniqueIdentifier
+        @Column(name = "linearId")
+        val linearId: UUID
 ) : PersistentState() {}
