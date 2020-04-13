@@ -5,12 +5,14 @@ import net.corda.core.schemas.PersistentState
 import java.util.*
 import javax.persistence.Column
 import javax.persistence.Entity
+import javax.persistence.Id
 import javax.persistence.Table
 
 
 @Entity
 @Table(name = "MODEL_STATES")
 class PersistentModel(
+
         @Column(name = "STATUS")
         val status: String,
 

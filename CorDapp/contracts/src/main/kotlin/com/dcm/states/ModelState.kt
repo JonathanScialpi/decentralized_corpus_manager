@@ -3,7 +3,6 @@ package com.dcm.states
 import com.dcm.contract.ModelContract
 import com.dcm.schemas.ModelSchemaV1
 import com.dcm.schemas.PersistentModel
-import com.google.common.collect.ImmutableList
 import net.corda.core.contracts.BelongsToContract
 import net.corda.core.contracts.LinearState
 import net.corda.core.contracts.UniqueIdentifier
@@ -79,7 +78,7 @@ data class ModelState(
     }
 
     override fun supportedSchemas(): Iterable<MappedSchema> {
-      return ImmutableList.of(ModelSchemaV1())
+      return listOf(ModelSchemaV1())
     }
 
 }
