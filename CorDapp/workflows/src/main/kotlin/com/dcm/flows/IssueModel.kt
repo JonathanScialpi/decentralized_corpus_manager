@@ -14,35 +14,30 @@ import okhttp3.MediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody
+import java.io.IOException
 
 @InitiatingFlow
 @StartableByRPC
 
-class IssueModelFlow(
+open class IssueModelFlow(
         private val algorithmUsed : String,
-        private val classificationURL : String,
+        open val classificationURL : String,
         private val corpus: LinkedHashMap<String, String>,
         private val participants : List<Party>
 ): FlowLogic<SignedTransaction>() {
+    companion object{
+        var payload = LinkedHashMap<String, LinkedHashMap<String, String>>()
+    }
+
     @Suspendable
     override fun call(): SignedTransaction{
         val notary = serviceHub.networkMapCache.notaryIdentities.first()
         val transactionBuilder = TransactionBuilder(notary)
 
         // get new classification report
-        val payload = LinkedHashMap<String, LinkedHashMap<String, String>>()
         payload["corpus"] = corpus
-        val json = MediaType.parse("application/json; charset=utf-8")
-        val corpusJson =  Gson().toJson(payload)
-        val body = RequestBody.create(json, corpusJson)
-        val request = Request.Builder()
-                .url(classificationURL)
-                .post(body)
-                .build()
-        var response = OkHttpClient().newCall(request).execute()
-        val classificationReport: LinkedHashMap<String, LinkedHashMap<String, Double>> = Gson().fromJson(response.body().string(), object : TypeToken<LinkedHashMap<String, LinkedHashMap<String, Double>>>() {}.type)
-        response.body().close()
-        response = null
+        val classificationResponse = await(RetrieveClassificationReport())
+        val classificationReport: LinkedHashMap<String, LinkedHashMap<String, Double>> = Gson().fromJson(classificationResponse, object : TypeToken<LinkedHashMap<String, LinkedHashMap<String, Double>>>() {}.type)
 
         // finish building tx
         val outputModelState = ModelState(
@@ -63,6 +58,28 @@ class IssueModelFlow(
         val sessions = (participants - ourIdentity).map { initiateFlow(it) }.toSet()
         val stx = subFlow(CollectSignaturesFlow(ptx, sessions))
         return subFlow(FinalityFlow(stx, sessions))
+    }
+
+    inner class RetrieveClassificationReport : FlowExternalOperation<String>{
+        override fun execute(deduplicationId: String): String {
+            try{
+                val json = MediaType.parse("application/json; charset=utf-8")
+                val corpusJson =  Gson().toJson(payload)
+                val body = RequestBody.create(json, corpusJson)
+                val request = Request.Builder()
+                        .url(classificationURL)
+                        .post(body)
+                        .build()
+                var responseObject = OkHttpClient().newCall(request).execute()
+                val responseString = responseObject.body().string()
+                responseObject.body().close()
+                //responseObject = null
+                return responseString
+
+            }catch(e: IOException){
+                throw HospitalizeFlowException("External classification report call failed.", e)
+            }
+        }
     }
 }
 

@@ -206,12 +206,8 @@ class CloseModelTests {
         mockNetwork.runNetwork()
 
         val origModel = future.getOrThrow().tx.outputs.single().data as ModelState
-        val flowTwo = CloseModelFlow(
-                modelLinearId = origModel.linearId
-        )
-        val futureTwo = a.startFlow(flowTwo)
+
         mockNetwork.runNetwork()
-        //val closedModel = futureTwo.getOrThrow().tx.outputs.single().data as ModelState
 
         val flowThree = UpdateClassificationURL(
                 newURL = "http://127.0.0.1:5000/classify",
