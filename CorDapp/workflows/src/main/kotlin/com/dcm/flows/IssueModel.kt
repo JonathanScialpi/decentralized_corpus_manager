@@ -21,7 +21,7 @@ import java.io.IOException
 
 open class IssueModelFlow(
         private val algorithmUsed : String,
-        open val classificationURL : String,
+        private val classificationURL : String,
         private val corpus: LinkedHashMap<String, String>,
         private val participants : List<Party>
 ): FlowLogic<SignedTransaction>() {
@@ -70,10 +70,9 @@ open class IssueModelFlow(
                         .url(classificationURL)
                         .post(body)
                         .build()
-                var responseObject = OkHttpClient().newCall(request).execute()
+                val responseObject = OkHttpClient().newCall(request).execute()
                 val responseString = responseObject.body().string()
                 responseObject.body().close()
-                //responseObject = null
                 return responseString
 
             }catch(e: IOException){

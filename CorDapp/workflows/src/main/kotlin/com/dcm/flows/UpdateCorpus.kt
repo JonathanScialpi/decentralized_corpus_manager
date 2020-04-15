@@ -16,6 +16,7 @@ import okhttp3.MediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody
+import java.io.IOException
 
 @InitiatingFlow
 @StartableByRPC
@@ -23,6 +24,11 @@ class UpdateCorpusFlow(
         private val proposedCorpus: LinkedHashMap<String, String>,
         private val modelLinearId: UniqueIdentifier
 ): FlowLogic<SignedTransaction>() {
+    companion object{
+        var payload = LinkedHashMap<String, LinkedHashMap<String, String>>()
+        lateinit var classificationURL : String
+    }
+
     @Suspendable
     override fun call(): SignedTransaction{
         val notary = serviceHub.networkMapCache.notaryIdentities.first()
@@ -33,22 +39,13 @@ class UpdateCorpusFlow(
         val modelStateAndRef =  serviceHub.vaultService.queryBy<ModelState>(queryCriteria).states.single()
         transactionBuilder.addInputState(modelStateAndRef)
         val inputModelState = modelStateAndRef.state.data
+        classificationURL = inputModelState.classificationURL
         var outputModelState = inputModelState.replaceModelCorpus(proposedCorpus)
 
         // get new classification report
-        val payload = LinkedHashMap<String, LinkedHashMap<String, String>>()
         payload["corpus"] = proposedCorpus
-        val json = MediaType.parse("application/json; charset=utf-8")
-        val corpusJson =  Gson().toJson(payload)
-        val body = RequestBody.create(json, corpusJson)
-        val request = Request.Builder()
-                .url(inputModelState.classificationURL)
-                .post(body)
-                .build()
-        var response = OkHttpClient().newCall(request).execute()
-        val newClassificationReport: LinkedHashMap<String, LinkedHashMap<String, Double>> = Gson().fromJson(response.body().string(), object : TypeToken<LinkedHashMap<String, LinkedHashMap<String, Double>>>() {}.type)
-        response.body().close()
-        response = null
+        val classificationResponse = await(RetrieveClassificationReport())
+        val newClassificationReport: LinkedHashMap<String, LinkedHashMap<String, Double>> = Gson().fromJson(classificationResponse, object : TypeToken<LinkedHashMap<String, LinkedHashMap<String, Double>>>() {}.type)
 
         // finish building tx
         outputModelState = outputModelState.replaceClassificationReport(newClassificationReport)
@@ -62,6 +59,26 @@ class UpdateCorpusFlow(
         val sessions = (inputModelState.participants - ourIdentity).map { initiateFlow(it) }.toSet()
         val stx = subFlow(CollectSignaturesFlow(ptx, sessions))
         return subFlow(FinalityFlow(stx, sessions))
+    }
+    inner class RetrieveClassificationReport : FlowExternalOperation<String>{
+        override fun execute(deduplicationId: String): String {
+            try{
+                val json = MediaType.parse("application/json; charset=utf-8")
+                val corpusJson =  Gson().toJson(payload)
+                val body = RequestBody.create(json, corpusJson)
+                val request = Request.Builder()
+                        .url(classificationURL)
+                        .post(body)
+                        .build()
+                val responseObject = OkHttpClient().newCall(request).execute()
+                val responseString = responseObject.body().string()
+                responseObject.body().close()
+                return responseString
+
+            }catch(e: IOException){
+                throw HospitalizeFlowException("External classification report call failed.", e)
+            }
+        }
     }
 }
 
