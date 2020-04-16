@@ -144,7 +144,7 @@ class IssueModelFlowTests {
     @Test
     fun flowReturnsVerifiedPartiallySignedTransaction() {
         // Check that an empty corpus fails
-        val creator = a.info.chooseIdentityAndCert().party
+        a.info.chooseIdentityAndCert().party
         val otherParty = b.info.chooseIdentityAndCert().party
         val emptyCorpus = LinkedHashMap<String, String>()
         val emptyCorpusFlow = IssueModelFlow(
@@ -170,7 +170,6 @@ class IssueModelFlowTests {
 
     @Test
     fun flowReturnsTransactionSignedByBothParties() {
-        val creator = a.info.chooseIdentityAndCert().party
         val otherParty = b.info.chooseIdentityAndCert().party
         val flow = IssueModelFlow(
                 algorithmUsed = "Passive Aggressive",
@@ -186,7 +185,6 @@ class IssueModelFlowTests {
 
     @Test
     fun flowRecordsTheSameTransactionInBothPartyVaults() {
-        val creator = a.info.chooseIdentityAndCert().party
         val otherParty = b.info.chooseIdentityAndCert().party
         val flow = IssueModelFlow(
                 algorithmUsed = "Passive Aggressive",
