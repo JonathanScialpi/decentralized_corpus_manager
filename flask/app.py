@@ -6,9 +6,11 @@ from sklearn.linear_model import PassiveAggressiveClassifier
 from sklearn.metrics import (accuracy_score, classification_report, confusion_matrix)
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
+from flask_cors import CORS
 import requests
 
 app = Flask(__name__)
+CORS(app)
 
 # @DEV: A simple endpoint to make sure that the server is up and running
 @app.route("/", methods=['GET'])
@@ -19,7 +21,9 @@ def home():
 # @Param: Corpus is the Hashmanp<String,String> where each key is an utterance and each value is a label
 @app.route("/classify", methods=['POST'])
 def passive_aggressive_classifier():
-    
+
+    print("test")
+    print(request.json)    
     #loop through csv to build training_data and target_label_array
     training_data = []
     target_label_array = []
