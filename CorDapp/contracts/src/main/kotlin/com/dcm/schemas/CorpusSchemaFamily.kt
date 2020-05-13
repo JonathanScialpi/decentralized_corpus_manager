@@ -1,4 +1,4 @@
 package com.dcm.schemas
 
-class ModelSchemaFamily {
+class CorpusSchemaFamily {
 }

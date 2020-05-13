@@ -12,7 +12,7 @@ export default class Book extends Component{
     }
 
     intialState = {
-        modelLinearId:'', testUtterances:''
+        corpusLinearId:'', testUtterances:''
     }
 
     resetClassification = () => {
@@ -20,13 +20,13 @@ export default class Book extends Component{
     }
 
     submitClassification = event => {
-        alert('URL: http://localhost:8080/modelLookup , ModelLinearId: ' 
-        + this.state.modelLinearId + ', testUtterances: ' + this.state.testUtterances
+        alert('URL: http://localhost:8080/corpusLookup , CorpusLinearId: ' 
+        + this.state.corpusLinearId + ', testUtterances: ' + this.state.testUtterances
          );
 
          const book = {
-            url: "http://localhost:8080/modelLookup",
-            modelLinearId: this.state.modelLinearId,
+            url: "http://localhost:8080/corpusLookup",
+            corpusLinearId: this.state.corpusLinearId,
             testUtterances: this.state.testUtterances.split("|")
          };
 
@@ -49,24 +49,24 @@ export default class Book extends Component{
         });
     }
     render(){
-        const {modelLinearId, testUtterances} = this.state;
+        const {corpusLinearId, testUtterances} = this.state;
 
         return(
             <Card className = {"border border-dark bg-dark text-white"}>
-                <Card.Header><FontAwesomeIcon icon={faPlusSquare}/> Model Linear ID</Card.Header>
+                <Card.Header><FontAwesomeIcon icon={faPlusSquare}/> Corpus Linear ID</Card.Header>
                 <Form id = "bookFormId" onReset = {this.resetClassification}  onSubmit = {this.submitClassification}>
                 <Card.Body>
                     <Form.Row>
-                        <Form.Group as={Col} controlId = "formGridModelLinearId">
-                            <Form.Label>Model Linear ID</Form.Label>
+                        <Form.Group as={Col} controlId = "formGridCorpusLinearId">
+                            <Form.Label>Corpus Linear ID</Form.Label>
                             <Form.Control 
                             required
-                            value = {modelLinearId}
+                            value = {corpusLinearId}
                             onChange = {this.classificationChange}
-                            name = "modelLinearId"
+                            name = "corpusLinearId"
                             type="text"
                             className = {"bg-dark text-white"}
-                            placeholder="Enter Model Linear ID" />
+                            placeholder="Enter Corpus Linear ID" />
                         </Form.Group>
                         <Form.Group as={Col} controlId = "formGridTestUtterances">
                             <Form.Label>Test Utterances</Form.Label>

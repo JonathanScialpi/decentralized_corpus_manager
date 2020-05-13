@@ -1,8 +1,8 @@
 package com.dcm.flows
 
 import co.paralleluniverse.fibers.Suspendable
-import com.dcm.contract.ModelContract
-import com.dcm.states.ModelState
+import com.dcm.contract.CorpusContract
+import com.dcm.states.CorpusState
 import net.corda.core.contracts.UniqueIdentifier
 import net.corda.core.contracts.requireThat
 import net.corda.core.flows.*
@@ -14,8 +14,8 @@ import net.corda.core.transactions.TransactionBuilder
 @InitiatingFlow
 @StartableByRPC
 
-class CloseModelFlow(
-private val modelLinearId: UniqueIdentifier
+class CloseCorpusFlow(
+private val corpusLinearId: UniqueIdentifier
 
 ): FlowLogic<SignedTransaction>() {
     @Suspendable
@@ -24,28 +24,28 @@ private val modelLinearId: UniqueIdentifier
         val notary = serviceHub.networkMapCache.notaryIdentities.first()
         val transactionBuilder = TransactionBuilder(notary)
 
-        // get current model state and use as input state
-        val queryCriteria = QueryCriteria.LinearStateQueryCriteria(linearId = listOf(modelLinearId))
-        val modelStateAndRef =  serviceHub.vaultService.queryBy<ModelState>(queryCriteria).states.single()
+        // get current corpus state and use as input state
+        val queryCriteria = QueryCriteria.LinearStateQueryCriteria(linearId = listOf(corpusLinearId))
+        val corpusStateAndRef =  serviceHub.vaultService.queryBy<CorpusState>(queryCriteria).states.single()
 
-        //set model status to closed before exiting the state
-        subFlow(SetClosedStatusFlow(modelStateAndRef))
-        val newModelStateAndRef =  serviceHub.vaultService.queryBy<ModelState>(queryCriteria).states.single()
-        transactionBuilder.addInputState(newModelStateAndRef)
-        val inputModelState = newModelStateAndRef.state.data
+        //set corpus status to closed before exiting the state
+        subFlow(SetClosedStatusFlow(corpusStateAndRef))
+        val newCorpusStateAndRef =  serviceHub.vaultService.queryBy<CorpusState>(queryCriteria).states.single()
+        transactionBuilder.addInputState(newCorpusStateAndRef)
+        val inputCorpusState = newCorpusStateAndRef.state.data
 
-        if(ourIdentity != inputModelState.owner){
-            throw IllegalArgumentException("Only the owner can close a model.")
+        if(ourIdentity != inputCorpusState.owner){
+            throw IllegalArgumentException("Only the owner can close a corpus.")
         }
 
         // finish building tx without an output state so we can exit the state
-        val commandData = ModelContract.Commands.CloseModel()
-        transactionBuilder.addCommand(commandData, inputModelState.participants.map { it.owningKey })
+        val commandData = CorpusContract.Commands.CloseCorpus()
+        transactionBuilder.addCommand(commandData, inputCorpusState.participants.map { it.owningKey })
         transactionBuilder.verify(serviceHub)
 
         // sign and get other signatures
         val ptx = serviceHub.signInitialTransaction(transactionBuilder)
-        val sessions = (inputModelState.participants - ourIdentity).map { initiateFlow(it) }.toSet()
+        val sessions = (inputCorpusState.participants - ourIdentity).map { initiateFlow(it) }.toSet()
         val stx = subFlow(CollectSignaturesFlow(ptx, sessions))
         return subFlow(FinalityFlow(stx, sessions))
     }
@@ -53,8 +53,8 @@ private val modelLinearId: UniqueIdentifier
 
 }
 
-@InitiatedBy(CloseModelFlow::class)
-class CloseModelFlowResponder(val counterpartySession: FlowSession): FlowLogic<SignedTransaction>() {
+@InitiatedBy(CloseCorpusFlow::class)
+class CloseCorpusFlowResponder(val counterpartySession: FlowSession): FlowLogic<SignedTransaction>() {
 
     @Suspendable
     override fun call(): SignedTransaction {
