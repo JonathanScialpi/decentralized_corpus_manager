@@ -1,39 +1,46 @@
 package com.dcm.flow
 
-import com.dcm.flows.IssueModelFlow
-import com.dcm.flows.ModelIssueFlowResponder
-import net.corda.client.rpc.CordaRPCClient
+import com.dcm.contract.CorpusContract
+import com.dcm.flows.CorpusIssueFlowResponder
+import com.dcm.flows.IssueCorpusFlow
+import com.dcm.states.CorpusState
+import com.google.gson.JsonSyntaxException
 import net.corda.core.identity.CordaX500Name
-import net.corda.core.identity.Party
-import net.corda.core.internal.InputStreamAndHash
-import net.corda.core.internal.concurrent.transpose
-import net.corda.core.messaging.startFlow
+import net.corda.core.transactions.SignedTransaction
 import net.corda.core.utilities.getOrThrow
-import net.corda.node.services.config.MB
-import net.corda.testing.common.internal.testNetworkParameters
-import net.corda.testing.core.ALICE_NAME
-import net.corda.testing.core.BOB_NAME
-import net.corda.testing.core.TestIdentity
-import net.corda.testing.driver.DriverParameters
-import net.corda.testing.driver.driver
-import net.corda.testing.node.*
-import net.corda.testing.node.internal.DUMMY_CONTRACTS_CORDAPP
-import net.corda.testing.node.internal.enclosedCordapp
+import net.corda.testing.internal.chooseIdentityAndCert
+import net.corda.testing.node.MockNetwork
+import net.corda.testing.node.MockNetworkNotarySpec
+import net.corda.testing.node.MockNodeParameters
+import net.corda.testing.node.StartedMockNode
+import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 
-class IssueModelDriverTests {
-    companion object {
-        val BOB = TestIdentity(BOB_NAME, 80).party
-        var origClassificationReport = LinkedHashMap<String, LinkedHashMap<String, Double>>()
-        var newClassificationReport =  LinkedHashMap<String, LinkedHashMap<String, Double>>()
-        var origCorpus =  LinkedHashMap<String, String>()
-        var newCorpus = LinkedHashMap<String, String>()
-    }
+class IssueCorpusFlowTests {
+
+    private lateinit var mockNetwork: MockNetwork
+    private lateinit var a: StartedMockNode
+    private lateinit var b: StartedMockNode
+    private var origClassificationReport = LinkedHashMap<String, LinkedHashMap<String, Double>>()
+    private var newClassificationReport =  LinkedHashMap<String, LinkedHashMap<String, Double>>()
+    private var origCorpus =  LinkedHashMap<String, String>()
+    private var newCorpus = LinkedHashMap<String, String>()
 
     @Before
     fun setup() {
+        mockNetwork = MockNetwork(
+                listOf("com.dcm"),
+                notarySpecs = listOf(MockNetworkNotarySpec(CordaX500Name("Notary", "London", "GB")))
+        )
+        a = mockNetwork.createNode(MockNodeParameters())
+        b = mockNetwork.createNode(MockNodeParameters())
+        val startedNodes = arrayListOf(a, b)
+        // For real nodes this happens automatically, but we have to manually register the flow for tests
+        startedNodes.forEach { it.registerInitiatedFlow(CorpusIssueFlowResponder::class.java) }
+        mockNetwork.runNetwork()
 
         origClassificationReport["BookRestaurant"] = linkedMapOf("f1-score" to 0.9975103734439834)
         origClassificationReport["BookRestaurant"] = linkedMapOf("precision" to 0.9983388704318937)
@@ -100,19 +107,101 @@ class IssueModelDriverTests {
         newCorpus["Add Tranquility to the Latin Pop Rising playlist."] = "Negative"
     }
 
+    @After
+    fun tearDown() {
+        mockNetwork.stopNodes()
+    }
+
     @Test
-    fun issueModelDriverTest() {
-        driver(DriverParameters(
-                startNodesInProcess = true,
-                cordappsForAllNodes = listOf(TestCordapp.findCordapp("com.dcm.contract"), TestCordapp.findCordapp("com.dcm.states"), TestCordapp.findCordapp("com.dcm.flows"))
-                //networkParameters = testNetworkParameters(maxMessageSize = 15.MB.toInt(), maxTransactionSize = 13.MB.toInt())
-        )) {
-            val rpcUser = User("admin", "admin", setOf("ALL"))
-            val (alice, _) = listOf(ALICE_NAME, BOB_NAME).map { startNode(providedName = it, rpcUsers = listOf(rpcUser)) }.transpose().getOrThrow()
-            CordaRPCClient(alice.rpcAddress).use(rpcUser.username, rpcUser.password) {
-                // Should not throw any exceptions.
-                it.proxy.startFlow(::IssueModelFlow, "PassiveAgressive", "http://127.0.0.1:5000/classify", newCorpus, listOf(it.proxy.wellKnownPartyFromX500Name(BOB_NAME) as Party)).returnValue.getOrThrow()
-            }
+    fun flowReturnsCorrectlyFormedPartiallySignedTransaction() {
+        val creator = a.info.chooseIdentityAndCert().party
+        val otherParty = b.info.chooseIdentityAndCert().party
+        val flow = IssueCorpusFlow(
+                algorithmUsed = "Passive Aggressive",
+                classificationURL = "http://127.0.0.1:5000/classify",
+                corpus = newCorpus,
+                participants = listOf(otherParty)
+        )
+        val future = a.startFlow(flow)
+        mockNetwork.runNetwork()
+        // Return the unsigned(!) SignedTransaction object from the IOUIssueFlow.
+        val ptx: SignedTransaction = future.getOrThrow()
+        // Print the transaction for debugging purposes.
+        println(ptx.tx)
+        // Check the transaction is well formed...
+        // No outputs, one input IOUState and a command with the right properties.
+        assert(ptx.tx.inputs.isEmpty())
+        assert(ptx.tx.outputs.single().data is CorpusState)
+        val command = ptx.tx.commands.single()
+        assert(command.value is CorpusContract.Commands.Issue)
+        assert(creator.owningKey in command.signers)
+        ptx.verifySignaturesExcept(
+                otherParty.owningKey,
+                mockNetwork.defaultNotaryNode.info.legalIdentitiesAndCerts.first().owningKey
+        )
+    }
+
+    @Test
+    fun flowReturnsVerifiedPartiallySignedTransaction() {
+        // Check that an empty corpus fails
+        a.info.chooseIdentityAndCert().party
+        val otherParty = b.info.chooseIdentityAndCert().party
+        val emptyCorpus = LinkedHashMap<String, String>()
+        val emptyCorpusFlow = IssueCorpusFlow(
+                algorithmUsed = "Passive Aggressive",
+                classificationURL = "http://127.0.0.1:5000/classify",
+                corpus = emptyCorpus,
+                participants = listOf(otherParty)
+        )
+        val futureOne = a.startFlow(emptyCorpusFlow)
+        mockNetwork.runNetwork()
+        assertFailsWith<JsonSyntaxException> { futureOne.getOrThrow() }
+
+        // Check a good CorpusState passes.
+        val futureTwo = a.startFlow(IssueCorpusFlow(
+                algorithmUsed = "Passive Aggressive",
+                classificationURL = "http://127.0.0.1:5000/classify",
+                corpus = newCorpus,
+                participants = listOf(otherParty)
+        ))
+        mockNetwork.runNetwork()
+        futureTwo.getOrThrow()
+    }
+
+    @Test
+    fun flowReturnsTransactionSignedByBothParties() {
+        val otherParty = b.info.chooseIdentityAndCert().party
+        val flow = IssueCorpusFlow(
+                algorithmUsed = "Passive Aggressive",
+                classificationURL = "http://127.0.0.1:5000/classify",
+                corpus = newCorpus,
+                participants = listOf(otherParty)
+        )
+        val future = a.startFlow(flow)
+        mockNetwork.runNetwork()
+        val stx = future.getOrThrow()
+        stx.verifyRequiredSignatures()
+    }
+
+    @Test
+    fun flowRecordsTheSameTransactionInBothPartyVaults() {
+        val otherParty = b.info.chooseIdentityAndCert().party
+        val flow = IssueCorpusFlow(
+                algorithmUsed = "Passive Aggressive",
+                classificationURL = "http://127.0.0.1:5000/classify",
+                corpus = newCorpus,
+                participants = listOf(otherParty)
+        )
+        val future = a.startFlow(flow)
+        mockNetwork.runNetwork()
+        val stx = future.getOrThrow()
+        println("Signed transaction hash: ${stx.id}")
+        listOf(a, b).map {
+            it.services.validatedTransactions.getTransaction(stx.id)
+        }.forEach {
+            val txHash = (it as SignedTransaction).id
+            println("$txHash == ${stx.id}")
+            assertEquals(stx.id, txHash)
         }
     }
 }

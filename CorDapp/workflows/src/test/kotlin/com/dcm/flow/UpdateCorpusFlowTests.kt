@@ -1,9 +1,9 @@
 package com.dcm.flow
 
-import com.dcm.flows.IssueModelFlow
-import com.dcm.flows.ModelIssueFlowResponder
+import com.dcm.flows.CorpusIssueFlowResponder
+import com.dcm.flows.IssueCorpusFlow
 import com.dcm.flows.UpdateCorpusFlow
-import com.dcm.states.ModelState
+import com.dcm.states.CorpusState
 import net.corda.core.contracts.TransactionVerificationException
 import net.corda.core.identity.CordaX500Name
 import net.corda.core.utilities.getOrThrow
@@ -36,7 +36,7 @@ class UpdateCorpusFlowTests {
         b = mockNetwork.createNode(MockNodeParameters())
         val startedNodes = arrayListOf(a, b)
         // For real nodes this happens automatically, but we have to manually register the flow for tests
-        startedNodes.forEach { it.registerInitiatedFlow(ModelIssueFlowResponder::class.java) }
+        startedNodes.forEach { it.registerInitiatedFlow(CorpusIssueFlowResponder::class.java) }
         mockNetwork.runNetwork()
 
         origClassificationReport["BookRestaurant"] = linkedMapOf("f1-score" to 0.9975103734439834)
@@ -171,10 +171,10 @@ class UpdateCorpusFlowTests {
     }
 
     @Test
-    fun improveModel() {
+    fun improveCorpus() {
         val creator = a.info.chooseIdentityAndCert().party
         val otherParty = b.info.chooseIdentityAndCert().party
-        val flow = IssueModelFlow(
+        val flow = IssueCorpusFlow(
                 algorithmUsed = "Passive Aggressive",
                 classificationURL = "http://127.0.0.1:5000/classify",
                 corpus = origCorpus,
@@ -183,10 +183,10 @@ class UpdateCorpusFlowTests {
         val future = a.startFlow(flow)
         mockNetwork.runNetwork()
 
-        val origModel = future.getOrThrow().tx.outputs.single().data as ModelState
+        val origCorpus = future.getOrThrow().tx.outputs.single().data as CorpusState
         val flowTwo = UpdateCorpusFlow(
                 proposedCorpus = newCorpus,
-                modelLinearId = origModel.linearId
+                corpusLinearId = origCorpus.linearId
         )
         val futureTwo = b.startFlow(flowTwo)
         mockNetwork.runNetwork()
@@ -194,10 +194,10 @@ class UpdateCorpusFlowTests {
     }
 
     @Test
-    fun worsenModel() {
+    fun worsenCorpus() {
         val creator = a.info.chooseIdentityAndCert().party
         val otherParty = b.info.chooseIdentityAndCert().party
-        val flow = IssueModelFlow(
+        val flow = IssueCorpusFlow(
                 algorithmUsed = "Passive Aggressive",
                 classificationURL = "http://127.0.0.1:5000/classify",
                 corpus = newCorpus,
@@ -206,10 +206,10 @@ class UpdateCorpusFlowTests {
         val future = a.startFlow(flow)
         mockNetwork.runNetwork()
 
-        val origModel = future.getOrThrow().tx.outputs.single().data as ModelState
+        val origCorpuState = future.getOrThrow().tx.outputs.single().data as CorpusState
         val flowTwo = UpdateCorpusFlow(
                 proposedCorpus = origCorpus,
-                modelLinearId = origModel.linearId
+                corpusLinearId = origCorpuState.linearId
         )
         val futureTwo = b.startFlow(flowTwo)
         mockNetwork.runNetwork()

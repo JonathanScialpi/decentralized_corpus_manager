@@ -1,8 +1,8 @@
 package com.dcm.flows
 
 import co.paralleluniverse.fibers.Suspendable
-import com.dcm.contract.ModelContract
-import com.dcm.states.ModelState
+import com.dcm.contract.CorpusContract
+import com.dcm.states.CorpusState
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import net.corda.core.contracts.requireThat
@@ -19,7 +19,7 @@ import java.io.IOException
 @InitiatingFlow
 @StartableByRPC
 
-open class IssueModelFlow(
+open class IssueCorpusFlow(
         private val algorithmUsed : String,
         private val classificationURL : String,
         private val corpus: LinkedHashMap<String, String>,
@@ -40,7 +40,7 @@ open class IssueModelFlow(
         val classificationReport: LinkedHashMap<String, LinkedHashMap<String, Double>> = Gson().fromJson(classificationResponse, object : TypeToken<LinkedHashMap<String, LinkedHashMap<String, Double>>>() {}.type)
 
         // finish building tx
-        val outputModelState = ModelState(
+        val outputCorpusState = CorpusState(
                 "Open",
                 algorithmUsed,
                 classificationURL,
@@ -48,9 +48,9 @@ open class IssueModelFlow(
                 classificationReport,
                 ourIdentity,
                 participants)
-        val commandData = ModelContract.Commands.Issue()
+        val commandData = CorpusContract.Commands.Issue()
         transactionBuilder.addCommand(commandData, participants.plus(ourIdentity).map { it.owningKey })
-        transactionBuilder.addOutputState(outputModelState, ModelContract.ID)
+        transactionBuilder.addOutputState(outputCorpusState, CorpusContract.ID)
         transactionBuilder.verify(serviceHub)
 
         // sign and get other signatures
@@ -82,15 +82,15 @@ open class IssueModelFlow(
     }
 }
 
-@InitiatedBy(IssueModelFlow::class)
-class ModelIssueFlowResponder(val counterpartySession: FlowSession): FlowLogic<SignedTransaction>() {
+@InitiatedBy(IssueCorpusFlow::class)
+class CorpusIssueFlowResponder(val counterpartySession: FlowSession): FlowLogic<SignedTransaction>() {
 
     @Suspendable
     override fun call(): SignedTransaction {
         val signedTransactionFlow = object : SignTransactionFlow(counterpartySession) {
             override fun checkTransaction(stx: SignedTransaction) = requireThat {
                 val output = stx.tx.outputs.single().data
-                "This must be an Model State transaction" using (output is ModelState)
+                "This must be an Corpus State transaction" using (output is CorpusState)
             }
         }
 

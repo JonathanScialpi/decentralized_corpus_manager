@@ -1,6 +1,6 @@
 package net.corda.training.com.dcm.state
 
-import com.dcm.states.ModelState
+import com.dcm.states.CorpusState
 import net.corda.core.contracts.UniqueIdentifier
 import net.corda.training.ALICE
 import net.corda.training.BOB
@@ -8,7 +8,7 @@ import org.junit.Before
 import org.junit.Test
 import kotlin.test.assertEquals
 
-class ModelStateTests {
+class CorpusStateTests {
     private var origClassificationReport = LinkedHashMap<String, LinkedHashMap<String, Double>>()
     private var newClassificationReport =  LinkedHashMap<String, LinkedHashMap<String, Double>>()
     private var origCorpus =  LinkedHashMap<String, String>()
@@ -56,31 +56,31 @@ class ModelStateTests {
 
     @Test
     fun hasAllFieldsAndProperTypes(){
-        ModelState::class.java.getDeclaredField("status")
-        assertEquals(ModelState::class.java.getDeclaredField("status").type, String::class.java)
+        CorpusState::class.java.getDeclaredField("status")
+        assertEquals(CorpusState::class.java.getDeclaredField("status").type, String::class.java)
 
-        ModelState::class.java.getDeclaredField("algorithmUsed")
-        assertEquals(ModelState::class.java.getDeclaredField("algorithmUsed").type, String::class.java)
+        CorpusState::class.java.getDeclaredField("algorithmUsed")
+        assertEquals(CorpusState::class.java.getDeclaredField("algorithmUsed").type, String::class.java)
 
-        ModelState::class.java.getDeclaredField("classificationURL")
-        assertEquals(ModelState::class.java.getDeclaredField("classificationURL").type, String::class.java)
+        CorpusState::class.java.getDeclaredField("classificationURL")
+        assertEquals(CorpusState::class.java.getDeclaredField("classificationURL").type, String::class.java)
 
-        ModelState::class.java.getDeclaredField("corpus")
-        assertEquals(ModelState::class.java.getDeclaredField("corpus").type, LinkedHashMap::class.java)
+        CorpusState::class.java.getDeclaredField("corpus")
+        assertEquals(CorpusState::class.java.getDeclaredField("corpus").type, LinkedHashMap::class.java)
 
-        ModelState::class.java.getDeclaredField("classificationReport")
-        assertEquals(ModelState::class.java.getDeclaredField("classificationReport").type, LinkedHashMap::class.java)
+        CorpusState::class.java.getDeclaredField("classificationReport")
+        assertEquals(CorpusState::class.java.getDeclaredField("classificationReport").type, LinkedHashMap::class.java)
 
-        ModelState::class.java.getDeclaredField("participants")
-        assertEquals(ModelState::class.java.getDeclaredField("participants").type, List::class.java)
+        CorpusState::class.java.getDeclaredField("participants")
+        assertEquals(CorpusState::class.java.getDeclaredField("participants").type, List::class.java)
 
-        ModelState::class.java.getDeclaredField("linearId")
-        assertEquals(ModelState::class.java.getDeclaredField("linearId").type, UniqueIdentifier::class.java)
+        CorpusState::class.java.getDeclaredField("linearId")
+        assertEquals(CorpusState::class.java.getDeclaredField("linearId").type, UniqueIdentifier::class.java)
     }
 
     @Test
-    fun checkReplaceModelCorpus(){
-        val model = ModelState(
+    fun checkReplaceCorpusCorpus(){
+        val corpus = CorpusState(
                 status = "Open",
                 algorithmUsed = "Passive Aggressive",
                 classificationURL = "http://127.0.0.1:5000/classify",
@@ -90,12 +90,12 @@ class ModelStateTests {
                 participants = listOf(ALICE.party, BOB.party)
         )
 
-        assertEquals(newCorpus, model.replaceModelCorpus(newCorpus).corpus)
+        assertEquals(newCorpus, corpus.replaceCorpusCorpus(newCorpus).corpus)
     }
 
     @Test
-    fun checkReplaceModelClassificationReport(){
-        val model = ModelState(
+    fun checkReplaceCorpusClassificationReport(){
+        val corpus = CorpusState(
                 status = "Open",
                 algorithmUsed = "Passive Aggressive",
                 classificationURL = "http://127.0.0.1:5000/classify",
@@ -105,6 +105,6 @@ class ModelStateTests {
                 participants = listOf(ALICE.party, BOB.party)
         )
 
-        assertEquals(newClassificationReport, model.replaceClassificationReport(newClassificationReport).classificationReport)
+        assertEquals(newClassificationReport, corpus.replaceClassificationReport(newClassificationReport).classificationReport)
     }
 }
