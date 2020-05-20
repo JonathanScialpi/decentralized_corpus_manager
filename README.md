@@ -31,28 +31,28 @@ est` from the */CorDapp/build/libs` directory
 
 ## Spring Endpoints
 1. **issueCorpus:** An endpoint to issue a corpus using JSON.
-  - @Param: corpus is a LinkedHashMap<String, String> where the Key is the data row and the value is the
-  - @Param: algorithmUsed is a String describing the type of algo used to produce the model
-  - @Param: classificationURL is a String which represents the Flask endpoint where the classification report can be created from.
-  - @Param: participants is the list (Strings) of CordaX500 names for each party included on the TX.
+  - @Param: `corpus` is a LinkedHashMap<String, String> where the Key is the data row and the value is the
+  - @Param: `algorithmUsed` is a String describing the type of algo used to produce the model
+  - @Param: `classificationURL` is a String which represents the Flask endpoint where the classification report can be created from.
+  - @Param: `participants` is the list (Strings) of CordaX500 names for each party included on the TX.
 2. **updateCorpus:** An endpoint that allows a user to propose a new corpus for the model with the intent to improve it.
-  - @Param: proposedCorpus is a LinkedHashMap<String, String> where the Key is the data row and the value is the label.
-  - @Param: corpusLinearId is the LinearPointer used to query for the corpus state.
+  - @Param: `proposedCorpus` is a LinkedHashMap<String, String> where the Key is the data row and the value is the label.
+  - @Param: `corpusLinearId` is the LinearPointer used to query for the corpus state.
 3. **updateClassificationURL:** An endpoint for strictly modifying the URL that is used to build the classification report.
-  - @Param: newURL is a String representing the new endpoint used to produce the classification report.
-  - @Param: corpusLinearId is the LinearPointer used to query for the corpus state.
+  - @Param: `newURL` is a String representing the new endpoint used to produce the classification report.
+  - @Param: `corpusLinearId` is the LinearPointer used to query for the corpus state.
 4. **transferOwnership:** Only the owner of a corpus can "close" it or update its classification URL. This endpoint allows an owner to re-assign the ownership of a corpus.
-  - @Param: newOwner is the party representing the new owner of the corpus.
-  - @Param: corpusLinearId is the LinearPointer used to query for the corpus state.
+  - @Param: `newOwner` is the party representing the new owner of the corpus.
+  - @Param: `corpusLinearId` is the LinearPointer used to query for the corpus state.
 5. **closeCorpus:** An endpoint for the corpus owner to prevent any further changes to a corpus by pointing to the exit state.
-  - @Param: corpusLinearId is the LinearPointer used to query for the corpus state.
+  - @Param: `corpusLinearId` is the LinearPointer used to query for the corpus state.
 6. **issueCorpusWithCSV:** This endpoint gives the user has the option of using a CSV file delimited by "|" to use as a corpus for corpus state creation.
-  - @Param: csvFile is a multipart file that is a "|" delimited utterance (data|label).
-  - @Param: algorithmUsed is a String describing the type of algo used to produce the model
-  - @Param: classificationURL is a String which represents the Flask endpoint where the classification report can be created from.
-  - @Param: participants is the list (Strings) of CordaX500 names for each party included on the TX.
+  - @Param: `csvFile` is a multipart file that is a "|" delimited utterance (data|label).
+  - @Param: `algorithmUsed` is a String describing the type of algo used to produce the model
+  - @Param: `classificationURL` is a String which represents the Flask endpoint where the classification report can be created from.
+  - @Param: `participants` is the list (Strings) of CordaX500 names for each party included on the TX.
 7. **corpusLookup:** Retrieve the most recent version of a corpus state.
-  - @Param: corpusLinearId is the LinearPointer used to query for the corpus state.
+  - @Param: `corpusLinearId` is the LinearPointer used to query for the corpus state.
 
 
 
