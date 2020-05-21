@@ -56,5 +56,8 @@ From the */decentralized_corpus_manager/CorDapp/* directory:
 
 
 ## Issue & Update Corpus from Postman
-TODO...
+Import the sample [Postman requests](https://github.com/JonathanScialpi/decentralized_corpus_manager/blob/master/postman/Decentralized%20Corpus%20Manager.postman_collection.json)
+
+## Demo Video
+[IssueCorpus, UpdateCorpus, IssueCorpusWithCSV](https://r3.webex.com/recordingservice/sites/r3/recording/playback/f533bfc9070a4e7f9a6b2b0aff7c43e7)
 
