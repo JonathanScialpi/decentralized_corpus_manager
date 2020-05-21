@@ -17,8 +17,7 @@ From the */decentralized_corpus_manager/CorDapp/* directory:
 
 ## Starting the Spring Webserver
 - Build the Spring jar file by running `./gradlew clients::bootJar` command fromt the */CorDapp* directory.
-- Start the server with: `java -jar .\clients-0.1.jar --server.port:8080 --config.rpc.host=localhost --config.rpc.port=10006 --config.rpc.username=user1 --config.rpc.password=t
-est` from the */CorDapp/build/libs` directory
+- Start the server with: `java -jar .\clients-0.1.jar --server.port:8080 --config.rpc.host=localhost --config.rpc.port=10006 --config.rpc.username=user1 --config.rpc.password=test` from the */CorDapp/build/libs` directory
 
 ## Starting the Flask Server
 - If you don't have Flask (and using a Windows machine), watch [this video](https://www.youtube.com/watch?v=Nvz7wN23-hw).
