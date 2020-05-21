@@ -1,0 +1,412 @@
+{
+	"info": {
+		"_postman_id": "6ea99c13-729f-4959-8998-05df751e052e",
+		"name": "Decentralized Corpus Manager",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Get Test - Flask Server",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5000/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						""
+					]
+				},
+				"description": "Just make sure the endpoint is up and running"
+			},
+			"response": []
+		},
+		{
+			"name": "Classify with CSV - Flask Server",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"path_to_file\" : \"Training_Set.csv\",\n\t\"list_of_goals\" : [\"GetWeather\",\"BookRestaurant\",\"Negative\"]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5000/classify_with_csv",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"classify_with_csv"
+					]
+				},
+				"description": "Point to a CSV file on the flask server and receive a classification report"
+			},
+			"response": []
+		},
+		{
+			"name": "Server Status - Spring",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/status",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"status"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Issue corpus with CSV - POST",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "31ccc0e2-c2d9-4535-ac51-34fee32df5fe",
+						"exec": [
+							"pm.test('Status test', function(){",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"const jsonData = pm.response.json();",
+							"",
+							"pm.test('All Properties Returned', function(){",
+							"    pm.expect(jsonData).to.have.property(\"algorithmUsed\");",
+							"    pm.expect(jsonData).to.have.property(\"classificationURL\");",
+							"    pm.expect(jsonData).to.have.property(\"corpus\");",
+							"    pm.expect(jsonData).to.have.property(\"classificationReport\");",
+							"    pm.expect(jsonData).to.have.property(\"owner\");",
+							"    pm.expect(jsonData).to.have.property(\"participants\");",
+							"    pm.expect(jsonData).to.have.property(\"LinearID\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "csvFile",
+							"type": "file",
+							"src": "/C:/Users/Jonathan Scialpi/Desktop/dev/python/ML/training_files/Training_Set.csv"
+						},
+						{
+							"key": "algorithmUsed",
+							"value": "PassiveAgressive",
+							"type": "text"
+						},
+						{
+							"key": "classificationURL",
+							"value": "http://127.0.0.1:5000/classify",
+							"type": "text"
+						},
+						{
+							"key": "participants",
+							"value": "O=ContributerA,L=London,C=GB;O=ContributerB,L=New York,C=US",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:8080/issueCorpusWithCSV",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"issueCorpusWithCSV"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Corpus State - POST",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "b60e004d-1be1-4276-bed5-3f88e4ef6e5c",
+						"exec": [
+							"pm.test('Status test', function(){",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"const jsonData = pm.response.json();",
+							"",
+							"pm.test('All Properties Returned', function(){",
+							"    pm.expect(jsonData).to.have.property(\"algorithmUsed\");",
+							"    pm.expect(jsonData).to.have.property(\"classificationURL\");",
+							"    pm.expect(jsonData).to.have.property(\"corpus\");",
+							"    pm.expect(jsonData).to.have.property(\"classificationReport\");",
+							"    pm.expect(jsonData).to.have.property(\"owner\");",
+							"    pm.expect(jsonData).to.have.property(\"participants\");",
+							"    pm.expect(jsonData).to.have.property(\"LinearID\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"corpusLinearId\": \"0e185e24-dd2b-4a2e-bf21-47d8ee26e389\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/corpusLookup",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"corpusLookup"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Issue Corpus - POST",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "2725cf28-65a3-4604-a793-9cda490b7811",
+						"exec": [
+							"pm.test('Status test', function(){",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"const jsonData = pm.response.json();",
+							"",
+							"pm.test('All Properties Returned', function(){",
+							"    pm.expect(jsonData).to.have.property(\"algorithmUsed\");",
+							"    pm.expect(jsonData).to.have.property(\"classificationURL\");",
+							"    pm.expect(jsonData).to.have.property(\"corpus\");",
+							"    pm.expect(jsonData).to.have.property(\"classificationReport\");",
+							"    pm.expect(jsonData).to.have.property(\"owner\");",
+							"    pm.expect(jsonData).to.have.property(\"participants\");",
+							"    pm.expect(jsonData).to.have.property(\"LinearID\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"algorithmUsed\":\"PassiveAgressive\",\n\t\"classificationURL\":\"http://127.0.0.1:5000/classify\",\n\t\"corpus\":{\n\t\t\"I like green apples\": \"fruit\",\n\t\t\"I like red apples\": \"fruit\",\n\t\t\"Oranges are yummy!\": \"fruit\",\n\t\t\"I went to the store.\": \"negative\",\n\t\t\"I'll have a number two with no cheese please.\": \"negative\",\n\t\t\"Where is the best coffee spot?\": \"negative\"\n\t},\n\t\"participants\":\"O=ContributerA,L=London,C=GB;O=ContributerB,L=New York,C=US\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/issueCorpus",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"issueCorpus"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update Corpus - POST",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c2477d89-31b7-4d06-b54c-6e60fa4f73cf",
+						"exec": [
+							"pm.test('Status test', function(){",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"const jsonData = pm.response.json();",
+							"",
+							"pm.test('All Properties Returned', function(){",
+							"    pm.expect(jsonData).to.have.property(\"algorithmUsed\");",
+							"    pm.expect(jsonData).to.have.property(\"classificationURL\");",
+							"    pm.expect(jsonData).to.have.property(\"corpus\");",
+							"    pm.expect(jsonData).to.have.property(\"classificationReport\");",
+							"    pm.expect(jsonData).to.have.property(\"owner\");",
+							"    pm.expect(jsonData).to.have.property(\"participants\");",
+							"    pm.expect(jsonData).to.have.property(\"LinearID\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"proposedCorpus\":{\n\t\t\"I like green apples\": \"fruit\",\n\t\t\"I like red apples\": \"fruit\",\n\t\t\"Oranges are yummy!\": \"fruit\",\n\t\t\"I'm allergic to bananas actually.\": \"fruit\",\n\t\t\"I went to the store.\": \"negative\",\n\t\t\"I'll have a number two with no cheese please.\": \"negative\",\n\t\t\"Where is the best coffee spot?\": \"negative\",\n\t\t\"Where is carmen santiago?\" : \"negative\"\n\t},\n\t\"corpusLinearId\" : \"0e185e24-dd2b-4a2e-bf21-47d8ee26e389\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/updateCorpus",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"updateCorpus"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update Classification URL - POST",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "42f13093-1232-4827-813f-00059c8203d5",
+						"exec": [
+							"pm.test('Status test', function(){",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"const jsonData = pm.response.json();",
+							"",
+							"pm.test('All Properties Returned', function(){",
+							"    pm.expect(jsonData).to.have.property(\"algorithmUsed\");",
+							"    pm.expect(jsonData).to.have.property(\"classificationURL\");",
+							"    pm.expect(jsonData).to.have.property(\"corpus\");",
+							"    pm.expect(jsonData).to.have.property(\"classificationReport\");",
+							"    pm.expect(jsonData).to.have.property(\"owner\");",
+							"    pm.expect(jsonData).to.have.property(\"participants\");",
+							"    pm.expect(jsonData).to.have.property(\"LinearID\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"newURL\": \"www.google.com\",\n\t\"modelLinearId\" : \"84e92eb9-3ed5-464d-9b2b-cfb739f5f33c\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/updateClassificationURL",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"updateClassificationURL"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Test Classifier - Flask Server",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "73f37892-142e-4cd4-802a-1bea47d19407",
+						"exec": [
+							"pm.test('Status test', function(){",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"const jsonData = pm.response.json();",
+							"",
+							"pm.test('All Properties Returned', function(){",
+							"    pm.expect(jsonData).to.have.property(\"predictions\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"url\":\"http://localhost:8080/modelLookup\",\n\t\"modelLinearId\": \"9722f33c-897d-44d1-8755-de8600195492\",\n\t\"testUtterances\": [\"I would like to go to a steakhouse\"]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5000/test_classifier",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"test_classifier"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}

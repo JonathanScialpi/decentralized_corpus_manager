@@ -3,7 +3,7 @@ import {Card, Form, Button, Col} from 'react-bootstrap';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import {faSave, faPlusSquare, faUndo} from '@fortawesome/free-solid-svg-icons';
 import axios from 'axios';
-export default class Book extends Component{
+export default class Classify extends Component{
     constructor(props){
         super(props);
         this.state = this.intialState;
@@ -24,13 +24,13 @@ export default class Book extends Component{
         + this.state.corpusLinearId + ', testUtterances: ' + this.state.testUtterances
          );
 
-         const book = {
+         const classification = {
             url: "http://localhost:8080/corpusLookup",
             corpusLinearId: this.state.corpusLinearId,
             testUtterances: this.state.testUtterances.split("|")
          };
 
-         axios.post("http://localhost:5000/test_classifier", book)
+         axios.post("http://localhost:5000/test_classifier", classification)
          .then(response => {
              if(response.data !=null){
                  this.setState(this.intialState);
@@ -54,7 +54,7 @@ export default class Book extends Component{
         return(
             <Card className = {"border border-dark bg-dark text-white"}>
                 <Card.Header><FontAwesomeIcon icon={faPlusSquare}/> Corpus Linear ID</Card.Header>
-                <Form id = "bookFormId" onReset = {this.resetClassification}  onSubmit = {this.submitClassification}>
+                <Form id = "classificationFormId" onReset = {this.resetClassification}  onSubmit = {this.submitClassification}>
                 <Card.Body>
                     <Form.Row>
                         <Form.Group as={Col} controlId = "formGridCorpusLinearId">
