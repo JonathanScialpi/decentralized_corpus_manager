@@ -61,8 +61,8 @@ def passive_aggressive_classifier():
     return jsonify(classification_report_output)
 
 # @DEV: An endpoint that allows the user to test out the model with some given utterance[s]
-# @Param: URL is the spring server and endpoint used to retrive the model state's corpus to test with
-# @Param: modelLinearId is the LinearPointer UUID relative to the model state
+# @Param: URL is the spring server and endpoint used to retrive the corpus state's corpus to test with
+# @Param: corpusLinearId is the LinearPointer UUID relative to the corpus state
 # @Param: testUtterances is a list of user supplied utterances (Strings) to be classified
 @app.route("/test_classifier", methods=['POST'])
 def test_passive_aggressive_classifier():
@@ -70,7 +70,7 @@ def test_passive_aggressive_classifier():
     response = requests.post(
         url = request.json["url"],
         json={
-            "modelLinearId" : request.json["modelLinearId"],
+            "corpusLinearId" : request.json["corpusLinearId"],
         }, 
         timeout = None
     )
