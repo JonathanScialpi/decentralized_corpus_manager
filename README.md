@@ -55,7 +55,7 @@ From the */decentralized_corpus_manager/CorDapp/* directory:
 
 
 
-## Issue & Update Corpus from Postman
+## Postman Collection
 Import the sample [Postman requests](https://github.com/JonathanScialpi/decentralized_corpus_manager/blob/master/postman/Decentralized%20Corpus%20Manager.postman_collection.json)
 
 ## Demo Video
