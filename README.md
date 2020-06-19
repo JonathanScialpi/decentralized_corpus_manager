@@ -5,7 +5,7 @@
 # Decentralized Corpus Manager
 A CorDapp designed to facilitate the crowd sourcing of data used to build machine learning models.
 
-In my medium article (coming soon!) I discuss:
+In my [medium article](https://medium.com/corda/machine-learning-on-corda-558cadc8ba05) I discuss:
 - **What** common issues data scientists face when trying to build these models
 - **How** I solved these issues using Corda
 - **Why** Corda is the right choice for decentralized machine learning applications
