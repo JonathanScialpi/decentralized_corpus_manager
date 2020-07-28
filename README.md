@@ -25,6 +25,26 @@ From the */decentralized_corpus_manager/CorDapp/* directory:
 - Run the `activate` command from the *MyProject/Scripts/* directory to start up your virtual environment.
 - Start the server with `flask run`
 
+## Using Anaconda to start the flask application
+- If you have Anaconda Prompt already installed, you can use anaconda prompt to start the flask application. When you open Anaconda Prompt, you should be in the home directory, which is `C:\Users\John`
+- Step 1: Create a Virtual environment
+    - If you don't have virtualenv installed, run the command `pip install virtualenv`
+    - Run the command `virtualenv venv`. Note that `venv` is the name of our virtual environment. Feel free to replace `venv` with a more suitable name.
+    - To activate the virtual environment, navigate to the `Scripts` folder by typing `cd venv\Scripts`. After typing that command, type `activate`.
+    - If you activate your virtual environment correctly, you should see something like: `(venv) (base) C:\Users\John\venv\Scripts`
+- Step 2: Running the Flask Application
+    - We need to install flask. Now that you are in the virtual environment through Anaconda, run the command  `pip install flask`
+    - To see what version of flask you have, run the command `flask --version`
+    - In the virtual environment, we need to create a directory called `demoapp`. Run the command `mkdir demoapp` while in `(venv) (base) C:\Users\John\venv\Scripts`
+    - Open up a code editor. I used Sublime Text. Drag the folder you created in the previous step into the Sublime text window.
+    - In Sublime Text, you see on the left hand side an icon called "Folders" with `demoapp` already there. Right click the folder and select `New File`.
+    - Go to where you have the `decentralized_corpus_manager` folder in your computer. Click on the folder called `flask` and open the file called `app.py`.
+    - Copy and paste that code in the new file you created in Sublime Text. Save that file as `app.py`.
+    - Go to Anaconda and run the command `flask run`. If you execute this command correctly, you will see `Running on 127.0.0.1:5000/`. That is the localhost on your browser.
+    - If you execute `flask run` and Anaconda wants you to install additional libraries, run `pip install <libraryName>` for each library you are told. For example, to install scikit learn and numpy, run `pip install sklearn` and `pip install numpy` respectively. Feel free to google the pip install command to make sure you install the library correctly.
+    - Go to your browser and type `localhost:5000` and you should see `Hello from Flask>app.py`. If you examine the `app.py` file carefully, you will see `app.route()` in the documentation. That tells you what to enter into the browser to execute certain functions.
+
+
 ## Starting the Node Server
 - Run `npm start` from the *decentralized-corpus-management\react_app* directory
 
@@ -58,6 +78,11 @@ From the */decentralized_corpus_manager/CorDapp/* directory:
 ## Postman Collection
 Import the sample [Postman requests](https://github.com/JonathanScialpi/decentralized_corpus_manager/blob/master/postman/Decentralized%20Corpus%20Manager.postman_collection.json)
 
+If you don't have Postman installed, go to this [link](https://www.postman.com/downloads/). Follow the download instructions and open Postman.
+
+Once you open Postman, click `Import` on the top left hand corner and navigate to the folder `decentralized_corpus_manager/postman/postman-collection.json`. If you do it correctly, you should see 9 requests with two `GET` requests in green while the rest yellow.
+
+You should be ready for the demo video. We hope you enjoy learning about machine learning with Corda!
+
 ## Demo Video
 [IssueCorpus, UpdateCorpus, IssueCorpusWithCSV](https://youtu.be/JVLjxeZrz5U)
-
