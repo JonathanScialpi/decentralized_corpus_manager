@@ -1,6 +1,8 @@
 package com.dcm.webserver
 
 import com.dcm.flows.*
+import com.dcm.schemas.CorpusSchemaV1
+import com.dcm.schemas.PersistentCorpus
 import com.dcm.states.CorpusState
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.google.gson.Gson
@@ -9,7 +11,8 @@ import net.corda.core.contracts.UniqueIdentifier
 import net.corda.core.identity.CordaX500Name
 import net.corda.core.identity.Party
 import net.corda.core.messaging.startFlow
-import net.corda.core.node.services.vault.QueryCriteria
+import net.corda.core.node.services.Vault
+import net.corda.core.node.services.vault.*
 import org.slf4j.LoggerFactory
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -235,5 +238,23 @@ class Controller(rpc: NodeRPCConnection) {
         responseMap["participants"] = corpus.participants.toString()
         responseMap["LinearID"] = corpus.linearId
         return ResponseEntity.ok(Gson().toJson(responseMap))
+    }
+
+    // @DEV: Retrieve the most recent version of a corpus state.
+    // @Param: corpusLinearId is the LinearPointer used to query for the corpus state.
+    @RequestMapping(value = ["/consumedStateLookup"],  method = [RequestMethod.POST],  produces = ["application/json"])
+    private fun getConsumedStates() : ResponseEntity<String?> {
+        val algoIndex = builder { PersistentCorpus::algorithmUsed.equal("PassiveAgressive") }
+        val criteria = QueryCriteria.VaultCustomQueryCriteria(algoIndex, Vault.StateStatus.CONSUMED)
+        val results = proxy.vaultQueryByCriteria(criteria, LinearState::class.java).states
+//        val responseMap = HashMap<String, Any>()
+//        responseMap["algorithmUsed"] = corpus.algorithmUsed
+//        responseMap["classificationURL"] = corpus.classificationURL
+//        responseMap["corpus"] = corpus.corpus
+//        responseMap["classificationReport"] = corpus.classificationReport
+//        responseMap["owner"] = corpus.owner.toString()
+//        responseMap["participants"] = corpus.participants.toString()
+//        responseMap["LinearID"] = corpus.linearId
+        return ResponseEntity.ok(Gson().toJson(results))
     }
 }

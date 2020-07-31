@@ -53,7 +53,7 @@ data class CorpusState(
         return copy(owner = newOwner)
     }
 
-    fun replaceCorpusCorpus(newCorpus: LinkedHashMap<String, String>) : CorpusState{
+    fun replaceCorpus(newCorpus: LinkedHashMap<String, String>) : CorpusState{
         return copy(corpus = newCorpus)
     }
 
