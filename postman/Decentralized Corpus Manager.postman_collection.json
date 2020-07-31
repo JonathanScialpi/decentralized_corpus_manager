@@ -386,7 +386,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"url\":\"http://localhost:8080/modelLookup\",\n\t\"modelLinearId\": \"9722f33c-897d-44d1-8755-de8600195492\",\n\t\"testUtterances\": [\"I would like to go to a steakhouse\"]\n}",
+					"raw": "{\n\t\"url\":\"http://localhost:8080/corpusLookup\",\n\t\"corpusLinearId\": \"9722f33c-897d-44d1-8755-de8600195492\",\n\t\"testUtterances\": [\"I would like to go to a steakhouse\"]\n}",
 					"options": {
 						"raw": {
 							"language": "json"
