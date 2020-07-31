@@ -40,10 +40,12 @@ class UpdateCorpusFlow(
         transactionBuilder.addInputState(corpusStateAndRef)
         val inputCorpusState = corpusStateAndRef.state.data
         classificationURL = inputCorpusState.classificationURL
-        var outputCorpusState = inputCorpusState.replaceCorpusCorpus(proposedCorpus)
+        var outputCorpusState = inputCorpusState.replaceCorpus(proposedCorpus)
 
         // get new classification report
-        payload["corpus"] = proposedCorpus
+        payload["corpus"] = inputCorpusState.corpus
+        payload["proposedCorpus"] = proposedCorpus
+
         val classificationResponse = await(RetrieveClassificationReport())
         val newClassificationReport: LinkedHashMap<String, LinkedHashMap<String, Double>> = Gson().fromJson(classificationResponse, object : TypeToken<LinkedHashMap<String, LinkedHashMap<String, Double>>>() {}.type)
 
