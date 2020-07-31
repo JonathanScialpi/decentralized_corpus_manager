@@ -50,7 +50,7 @@ From the */decentralized_corpus_manager/CorDapp/* directory:
 
 ## Spring Endpoints
 1. **issueCorpus:** An endpoint to issue a corpus using JSON.
-  - @Param: `corpus` is a LinkedHashMap<String, String> where the Key is the data row and the value is the
+  - @Param: `corpus` is a LinkedHashMap<String, String> where the Key is the data row and the value is the classification label
   - @Param: `algorithmUsed` is a String describing the type of algo used to produce the model
   - @Param: `classificationURL` is a String which represents the Flask endpoint where the classification report can be created from.
   - @Param: `participants` is the list (Strings) of CordaX500 names for each party included on the TX.
