@@ -79,7 +79,7 @@ class CorpusStateTests {
     }
 
     @Test
-    fun checkReplaceCorpusCorpus(){
+    fun checkReplaceCorpus(){
         val corpus = CorpusState(
                 status = "Open",
                 algorithmUsed = "Passive Aggressive",
@@ -90,7 +90,7 @@ class CorpusStateTests {
                 participants = listOf(ALICE.party, BOB.party)
         )
 
-        assertEquals(newCorpus, corpus.replaceCorpusCorpus(newCorpus).corpus)
+        assertEquals(newCorpus, corpus.replaceCorpus(newCorpus).corpus)
     }
 
     @Test
