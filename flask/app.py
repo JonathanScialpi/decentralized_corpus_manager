@@ -1,4 +1,5 @@
 import json
+import numpy as np
 from flask import Flask, abort, jsonify, request
 from numpy import asarray, mean
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
@@ -141,3 +142,66 @@ def pac_with_csv():
     #accuracy_output = accuracy_score(predicted, y_test)
 
     return jsonify(classification_report_output)
+
+#Classifying with proposed corpus
+@app.route("/classify_updated", methods=['POST'])
+def passive_aggressive_proposed_corpus():
+    print("updating")
+    #get both the proposed and original corpus
+
+    proposedCorpus = request.json["proposedCorpus"]
+    currCorpus = request.json["corpus"]
+
+
+    #Find the brand new entries. Assume that proposedCorpus contains all
+    #entries in curr corpus
+
+    diffDict = {}
+
+    for key in proposedCorpus.keys():
+        if key not in currCorpus:
+           diffDict[key] = proposedCorpus[key]
+
+    #loop through entries in original corpus
+    training_data = []
+    target_label_array = []
+    list_of_goals = []
+    for k,v in currCorpus.items():
+        training_data.append(k)
+        target_label_array.append(v)
+    list_of_goals = target_label_array
+    target_label_array = asarray(target_label_array) #set to numpy array
+
+    #Seperate data into training and testing sets (30%)
+    X_train, X_test, y_train, y_test = train_test_split(training_data, target_label_array, test_size = 0.3, random_state = 42)
+
+    for k,v in diffDict.items():
+        X_train.append(k)
+        np.concatenate((y_train, [v]))
+    print("Here is our X_train")
+    return jsonify({"X_train": X_train, "Y_train_list" : y_train.tolist()})
+    """
+    #Setup training data to PassiveAgressiveClassifier Pipeline
+    text_clf = Pipeline([
+        ('vect', CountVectorizer()),
+        ('tfidf', TfidfTransformer()),
+        ('clf', PassiveAggressiveClassifier()),
+    ])
+
+    text_clf.fit(X_train, y_train)
+    predicted = text_clf.predict(X_test)
+
+    classification_report_output = classification_report(y_test, predicted,output_dict=True, target_names=list(set(list_of_goals)))
+
+    #normalize accuracy object
+    classification_report_output["accuracy"] = {"score": classification_report_output["accuracy"]}
+
+    #cast all scores to doubles/floats
+    for key in classification_report_output.keys():
+        if "support" in classification_report_output[key].keys():
+            classification_report_output[key]["support"] = float(classification_report_output[key]["support"])
+
+    return jsonify(classification_report_output)
+    """
+
+
