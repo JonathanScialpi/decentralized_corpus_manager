@@ -170,17 +170,19 @@ def passive_aggressive_proposed_corpus():
         training_data.append(k)
         target_label_array.append(v)
     list_of_goals = target_label_array
+    orig_target_label_array = target_label_array #set to numpy array
     target_label_array = asarray(target_label_array) #set to numpy array
 
     #Seperate data into training and testing sets (30%)
-    X_train, X_test, y_train, y_test = train_test_split(training_data, target_label_array, test_size = 0.3, random_state = 42)
+    X_train, X_test, y_train, y_test = train_test_split(training_data,
+    orig_target_label_array, test_size = 0.3, random_state = 42)
 
     for k,v in diffDict.items():
         X_train.append(k)
-        np.concatenate((y_train, [v]))
+        #np.concatenate((y_train, [v]))
+        y_train.append(v)
     print("Here is our X_train")
-    return jsonify({"X_train": X_train, "Y_train_list" : y_train.tolist()})
-    """
+
     #Setup training data to PassiveAgressiveClassifier Pipeline
     text_clf = Pipeline([
         ('vect', CountVectorizer()),
@@ -202,6 +204,5 @@ def passive_aggressive_proposed_corpus():
             classification_report_output[key]["support"] = float(classification_report_output[key]["support"])
 
     return jsonify(classification_report_output)
-    """
 
 
