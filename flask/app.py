@@ -152,38 +152,35 @@ def passive_aggressive_proposed_corpus():
     proposedCorpus = request.json["proposedCorpus"]
     currCorpus = request.json["corpus"]
 
+    commonCorpus = {}
+    deletions = {}
+    insertions = {}
 
-    #Find the brand new entries. Assume that proposedCorpus contains all
-    #entries in curr corpus
-
-    diffDict = {}
-
-    for key in proposedCorpus.keys():
-        if key not in currCorpus:
-           diffDict[key] = proposedCorpus[key]
-
-    #loop through entries in original corpus
-    training_data = []
-    target_label_array = []
-    list_of_goals = []
     for k,v in currCorpus.items():
+        if (k in proposedCorpus.keys()):
+            commonCorpus[k] = v
+        else:
+            deletions[k] = v
+    for k,v in proposedCorpus.items():
+        if (k not in currCorpus.keys()):
+            insertions[k] = v
+    training_data = []
+    target_labels = []
+
+    for k,v in commonCorpus.items():
         training_data.append(k)
-        target_label_array.append(v)
-    list_of_goals = target_label_array
-    orig_target_label_array = target_label_array #set to numpy array
-    target_label_array = asarray(target_label_array) #set to numpy array
+        target_labels.append(v)
+    orig_targets = target_labels
+    target_label_arr = asarray(target_labels)
 
-    #Seperate data into training and testing sets (30%)
+    #train-test-split
     X_train, X_test, y_train, y_test = train_test_split(training_data,
-    orig_target_label_array, test_size = 0.3, random_state = 42)
+    orig_targets, test_size = 0.3, random_state = 42)
 
-    for k,v in diffDict.items():
-        X_train.append(k)
-        #np.concatenate((y_train, [v]))
-        y_train.append(v)
-    print("Here is our X_train")
+    for k,v in insertions.items():
+         X_train.append(k)
+         y_train.append(v)
 
-    #Setup training data to PassiveAgressiveClassifier Pipeline
     text_clf = Pipeline([
         ('vect', CountVectorizer()),
         ('tfidf', TfidfTransformer()),
@@ -193,7 +190,8 @@ def passive_aggressive_proposed_corpus():
     text_clf.fit(X_train, y_train)
     predicted = text_clf.predict(X_test)
 
-    classification_report_output = classification_report(y_test, predicted,output_dict=True, target_names=list(set(list_of_goals)))
+    classification_report_output = classification_report(y_test, predicted,
+    output_dict=True, target_names=list(set(target_label_arr)))
 
     #normalize accuracy object
     classification_report_output["accuracy"] = {"score": classification_report_output["accuracy"]}
@@ -203,6 +201,8 @@ def passive_aggressive_proposed_corpus():
         if "support" in classification_report_output[key].keys():
             classification_report_output[key]["support"] = float(classification_report_output[key]["support"])
 
-    return jsonify(classification_report_output)
+    return jsonify({"Report": classification_report_output, "Corpus":
+    currCorpus})
+
 
 
