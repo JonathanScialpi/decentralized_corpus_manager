@@ -40,7 +40,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:5000/classify_with_csv",
+					"raw": "http://localhost:5000/issue_corpus_report_with_csv",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -119,7 +119,7 @@
 						},
 						{
 							"key": "classificationURL",
-							"value": "http://127.0.0.1:5000/classify",
+							"value": "http://127.0.0.1:5000/issue_corpus_report",
 							"type": "text"
 						},
 						{
@@ -230,7 +230,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"algorithmUsed\":\"PassiveAgressive\",\n\t\"classificationURL\":\"http://127.0.0.1:5000/classify\",\n\t\"corpus\":{\n\t\t\"I like green apples\": \"fruit\",\n\t\t\"I like red apples\": \"fruit\",\n\t\t\"Oranges are yummy!\": \"fruit\",\n\t\t\"I went to the store.\": \"negative\",\n\t\t\"I'll have a number two with no cheese please.\": \"negative\",\n\t\t\"Where is the best coffee spot?\": \"negative\"\n\t},\n\t\"participants\":\"O=ContributerA,L=London,C=GB;O=ContributerB,L=New York,C=US\"\n}",
+					"raw": "{\n\t\"algorithmUsed\":\"PassiveAgressive\",\n\t\"classificationURL\":\"http://127.0.0.1:5000/issue_corpus_report\",\n\t\"corpus\":{\n\t\t\"I like green apples\": \"fruit\",\n\t\t\"I like red apples\": \"fruit\",\n\t\t\"Oranges are yummy!\": \"fruit\",\n\t\t\"I went to the store.\": \"negative\",\n\t\t\"I'll have a number two with no cheese please.\": \"negative\",\n\t\t\"Where is the best coffee spot?\": \"negative\"\n\t},\n\t\"participants\":\"O=ContributerA,L=London,C=GB;O=ContributerB,L=New York,C=US\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"

@@ -102,7 +102,7 @@ def test_passive_aggressive_classifier():
 # produce the classification report from a CSV file stored on the Flask server.
 # @Param: pathToFile is where the CSV file is stored on the server.
 # @Param: listOfGoals is a list of labels to use when scoring.
-@app.route("/classify_with_csv", methods=['POST'])
+@app.route("/issue_corpus_report_with_csv", methods=['POST'])
 def pac_with_csv():
     orig_file = open(request.json["pathToFile"], "r", encoding="utf8")
     lines = orig_file.readlines()

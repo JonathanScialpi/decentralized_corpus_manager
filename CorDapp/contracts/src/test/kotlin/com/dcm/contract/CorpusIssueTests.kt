@@ -64,7 +64,7 @@ class CorpusIssueTests {
         val corpus = CorpusState(
                 status = "Open",
                 algorithmUsed = "Passive Aggressive",
-                classificationURL = "http://127.0.0.1:5000/classify",
+                classificationURL = "http://127.0.0.1:5000/issue_corpus_report",
                 corpus = origCorpus,
                 classificationReport = origClassificationReport,
                 owner = ALICE.party,
@@ -89,7 +89,7 @@ class CorpusIssueTests {
         val inputCorpusState = CorpusState(
                 status = "Open",
                 algorithmUsed = "Passive Aggressive",
-                classificationURL = "http://127.0.0.1:5000/classify",
+                classificationURL = "http://127.0.0.1:5000/issue_corpus_report",
                 corpus = origCorpus,
                 classificationReport = origClassificationReport,
                 owner = ALICE.party,
@@ -98,7 +98,7 @@ class CorpusIssueTests {
         val outputCorpusState = CorpusState(
                 status = "Open",
                 algorithmUsed = "Passive Aggressive",
-                classificationURL = "http://127.0.0.1:5000/classify",
+                classificationURL = "http://127.0.0.1:5000/issue_corpus_report",
                 corpus = newCorpus,
                 classificationReport = newClassificationReport,
                 owner = ALICE.party,
@@ -124,7 +124,7 @@ class CorpusIssueTests {
         val outputCorpusStateOne = CorpusState(
                 status = "Open",
                 algorithmUsed = "Passive Aggressive",
-                classificationURL = "http://127.0.0.1:5000/classify",
+                classificationURL = "http://127.0.0.1:5000/issue_corpus_report",
                 corpus = origCorpus,
                 classificationReport = origClassificationReport,
                 owner = ALICE.party,
@@ -133,7 +133,7 @@ class CorpusIssueTests {
         val outputCorpusStateTwo = CorpusState(
                 status = "Open",
                 algorithmUsed = "Passive Aggressive",
-                classificationURL = "http://127.0.0.1:5000/classify",
+                classificationURL = "http://127.0.0.1:5000/issue_corpus_report",
                 corpus = newCorpus,
                 classificationReport = newClassificationReport,
                 owner = ALICE.party,
@@ -159,7 +159,7 @@ class CorpusIssueTests {
         val outputCorpusStateNoParties = CorpusState(
                 status = "Open",
                 algorithmUsed = "Passive Aggressive",
-                classificationURL = "http://127.0.0.1:5000/classify",
+                classificationURL = "http://127.0.0.1:5000/issue_corpus_report",
                 corpus = newCorpus,
                 classificationReport = newClassificationReport,
                 owner = ALICE.party,
@@ -169,7 +169,7 @@ class CorpusIssueTests {
         val outputCorpusState = CorpusState(
                 status = "Open",
                 algorithmUsed = "Passive Aggressive",
-                classificationURL = "http://127.0.0.1:5000/classify",
+                classificationURL = "http://127.0.0.1:5000/issue_corpus_report",
                 corpus = newCorpus,
                 classificationReport = newClassificationReport,
                 owner = ALICE.party,
@@ -196,7 +196,7 @@ class CorpusIssueTests {
         val outputCorpusStateEmptyCorpus = CorpusState(
                 status = "Open",
                 algorithmUsed = "Passive Aggressive",
-                classificationURL = "http://127.0.0.1:5000/classify",
+                classificationURL = "http://127.0.0.1:5000/issue_corpus_report",
                 corpus = emptyCorpus,
                 classificationReport = newClassificationReport,
                 owner = ALICE.party,
@@ -206,7 +206,7 @@ class CorpusIssueTests {
         val outputCorpusState = CorpusState(
                 status = "Open",
                 algorithmUsed = "Passive Aggressive",
-                classificationURL = "http://127.0.0.1:5000/classify",
+                classificationURL = "http://127.0.0.1:5000/issue_corpus_report",
                 corpus = newCorpus,
                 classificationReport = newClassificationReport,
                 owner = ALICE.party,
@@ -233,7 +233,7 @@ class CorpusIssueTests {
         val outputCorpusStateEmptyClassificationReport = CorpusState(
                 status = "Open",
                 algorithmUsed = "Passive Aggressive",
-                classificationURL = "http://127.0.0.1:5000/classify",
+                classificationURL = "http://127.0.0.1:5000/issue_corpus_report",
                 corpus = origCorpus,
                 classificationReport = emptyClassificationReport,
                 owner = ALICE.party,
@@ -243,7 +243,7 @@ class CorpusIssueTests {
         val outputCorpusState = CorpusState(
                 status = "Open",
                 algorithmUsed = "Passive Aggressive",
-                classificationURL = "http://127.0.0.1:5000/classify",
+                classificationURL = "http://127.0.0.1:5000/issue_corpus_report",
                 corpus = newCorpus,
                 classificationReport = newClassificationReport,
                 owner = ALICE.party,
@@ -268,7 +268,7 @@ class CorpusIssueTests {
         val outputCorpusStateNoParties = CorpusState(
                 status = "Open",
                 algorithmUsed = "Passive Aggressive",
-                classificationURL = "http://127.0.0.1:5000/classify",
+                classificationURL = "http://127.0.0.1:5000/issue_corpus_report",
                 corpus = newCorpus,
                 classificationReport = newClassificationReport,
                 owner = ALICE.party,
@@ -278,7 +278,7 @@ class CorpusIssueTests {
         val outputCorpusState = CorpusState(
                 status = "Open",
                 algorithmUsed = "Passive Aggressive",
-                classificationURL = "http://127.0.0.1:5000/classify",
+                classificationURL = "http://127.0.0.1:5000/issue_corpus_report",
                 corpus = newCorpus,
                 classificationReport = newClassificationReport,
                 owner = ALICE.party,

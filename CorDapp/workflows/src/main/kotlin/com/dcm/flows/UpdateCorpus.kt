@@ -26,7 +26,7 @@ class UpdateCorpusFlow(
 ): FlowLogic<SignedTransaction>() {
     companion object{
         var payload = LinkedHashMap<String, LinkedHashMap<String, String>>()
-        lateinit var classificationURL : String
+        lateinit var classificationUpdateURL : String
     }
 
     @Suspendable
@@ -39,7 +39,7 @@ class UpdateCorpusFlow(
         val corpusStateAndRef =  serviceHub.vaultService.queryBy<CorpusState>(queryCriteria).states.single()
         transactionBuilder.addInputState(corpusStateAndRef)
         val inputCorpusState = corpusStateAndRef.state.data
-        classificationURL = inputCorpusState.classificationURL
+        classificationUpdateURL = inputCorpusState.classificationUpdateURL
         var outputCorpusState = inputCorpusState.replaceCorpus(proposedCorpus)
 
         // get new classification report
@@ -69,7 +69,7 @@ class UpdateCorpusFlow(
                 val corpusJson =  Gson().toJson(payload)
                 val body = RequestBody.create(json, corpusJson)
                 val request = Request.Builder()
-                        .url(classificationURL)
+                        .url(classificationUpdateURL)
                         .post(body)
                         .build()
                 val responseObject = OkHttpClient().newCall(request).execute()

@@ -118,7 +118,7 @@ class IssueCorpusFlowTests {
         val otherParty = b.info.chooseIdentityAndCert().party
         val flow = IssueCorpusFlow(
                 algorithmUsed = "Passive Aggressive",
-                classificationURL = "http://127.0.0.1:5000/classify",
+                classificationURL = "http://127.0.0.1:5000/issue_corpus_report",
                 corpus = newCorpus,
                 participants = listOf(otherParty)
         )
@@ -149,7 +149,7 @@ class IssueCorpusFlowTests {
         val emptyCorpus = LinkedHashMap<String, String>()
         val emptyCorpusFlow = IssueCorpusFlow(
                 algorithmUsed = "Passive Aggressive",
-                classificationURL = "http://127.0.0.1:5000/classify",
+                classificationURL = "http://127.0.0.1:5000/issue_corpus_report",
                 corpus = emptyCorpus,
                 participants = listOf(otherParty)
         )
@@ -160,7 +160,7 @@ class IssueCorpusFlowTests {
         // Check a good CorpusState passes.
         val futureTwo = a.startFlow(IssueCorpusFlow(
                 algorithmUsed = "Passive Aggressive",
-                classificationURL = "http://127.0.0.1:5000/classify",
+                classificationURL = "http://127.0.0.1:5000/issue_corpus_report",
                 corpus = newCorpus,
                 participants = listOf(otherParty)
         ))
@@ -173,7 +173,7 @@ class IssueCorpusFlowTests {
         val otherParty = b.info.chooseIdentityAndCert().party
         val flow = IssueCorpusFlow(
                 algorithmUsed = "Passive Aggressive",
-                classificationURL = "http://127.0.0.1:5000/classify",
+                classificationURL = "http://127.0.0.1:5000/issue_corpus_report",
                 corpus = newCorpus,
                 participants = listOf(otherParty)
         )
@@ -188,7 +188,7 @@ class IssueCorpusFlowTests {
         val otherParty = b.info.chooseIdentityAndCert().party
         val flow = IssueCorpusFlow(
                 algorithmUsed = "Passive Aggressive",
-                classificationURL = "http://127.0.0.1:5000/classify",
+                classificationURL = "http://127.0.0.1:5000/issue_corpus_report",
                 corpus = newCorpus,
                 participants = listOf(otherParty)
         )

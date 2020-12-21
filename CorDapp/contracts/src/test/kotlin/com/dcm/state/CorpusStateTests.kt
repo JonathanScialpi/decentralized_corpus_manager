@@ -83,7 +83,7 @@ class CorpusStateTests {
         val corpus = CorpusState(
                 status = "Open",
                 algorithmUsed = "Passive Aggressive",
-                classificationURL = "http://127.0.0.1:5000/classify",
+                classificationURL = "http://127.0.0.1:5000/issue_corpus_report",
                 corpus = origCorpus,
                 classificationReport = origClassificationReport,
                 owner = ALICE.party,
@@ -98,7 +98,7 @@ class CorpusStateTests {
         val corpus = CorpusState(
                 status = "Open",
                 algorithmUsed = "Passive Aggressive",
-                classificationURL = "http://127.0.0.1:5000/classify",
+                classificationURL = "http://127.0.0.1:5000/issue_corpus_report",
                 corpus = origCorpus,
                 classificationReport = origClassificationReport,
                 owner = ALICE.party,
