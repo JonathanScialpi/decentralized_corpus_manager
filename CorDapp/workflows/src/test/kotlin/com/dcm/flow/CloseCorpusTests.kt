@@ -177,6 +177,7 @@ class CloseCorpusTests {
         val flow = IssueCorpusFlow(
                 algorithmUsed = "Passive Aggressive",
                 classificationURL = "http://127.0.0.1:5000/issue_corpus_report",
+                classificationUpdateURL = "http://127.0.0.1:5000/update_corpus_report",
                 corpus = origCorpus,
                 participants = listOf(creator, otherParty)
         )
@@ -199,6 +200,7 @@ class CloseCorpusTests {
         val flow = IssueCorpusFlow(
                 algorithmUsed = "Passive Aggressive",
                 classificationURL = "http://127.0.0.1:5000/issue_corpus_report",
+                classificationUpdateURL = "http://127.0.0.1:5000/update_corpus_report",
                 corpus = origCorpus,
                 participants = listOf(creator, otherParty)
         )
@@ -210,7 +212,8 @@ class CloseCorpusTests {
         mockNetwork.runNetwork()
 
         val flowThree = UpdateClassificationURL(
-                newURL = "http://127.0.0.1:5000/issue_corpus_report",
+                classificationURL = "http://127.0.0.1:5000/issue_corpus_report",
+                classificationUpdateURL = "http://127.0.0.1:5000/update_corpus_report",
                 corpusLinearId = origCorpus.linearId
         )
         val futureThree = a.startFlow(flowThree)

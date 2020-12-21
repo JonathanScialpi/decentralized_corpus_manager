@@ -104,7 +104,7 @@ class IssueCorpusDriverTests {
             val (alice, _) = listOf(ALICE_NAME, BOB_NAME).map { startNode(providedName = it, rpcUsers = listOf(rpcUser)) }.transpose().getOrThrow()
             CordaRPCClient(alice.rpcAddress).use(rpcUser.username, rpcUser.password) {
                 // Should not throw any exceptions.
-                it.proxy.startFlow(::IssueCorpusFlow, "PassiveAgressive", "http://127.0.0.1:5000/issue_corpus_report", newCorpus, listOf(it.proxy.wellKnownPartyFromX500Name(BOB_NAME) as Party)).returnValue.getOrThrow()
+                it.proxy.startFlow(::IssueCorpusFlow, "PassiveAgressive", "http://127.0.0.1:5000/issue_corpus_report", "http://127.0.0.1:5000/update_corpus_report", newCorpus, listOf(it.proxy.wellKnownPartyFromX500Name(BOB_NAME) as Party)).returnValue.getOrThrow()
             }
         }
     }

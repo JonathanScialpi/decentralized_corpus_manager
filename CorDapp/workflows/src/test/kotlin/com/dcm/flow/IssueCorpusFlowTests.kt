@@ -119,6 +119,7 @@ class IssueCorpusFlowTests {
         val flow = IssueCorpusFlow(
                 algorithmUsed = "Passive Aggressive",
                 classificationURL = "http://127.0.0.1:5000/issue_corpus_report",
+                classificationUpdateURL = "http://127.0.0.1:5000/update_corpus_report",
                 corpus = newCorpus,
                 participants = listOf(otherParty)
         )
@@ -150,6 +151,7 @@ class IssueCorpusFlowTests {
         val emptyCorpusFlow = IssueCorpusFlow(
                 algorithmUsed = "Passive Aggressive",
                 classificationURL = "http://127.0.0.1:5000/issue_corpus_report",
+                classificationUpdateURL = "http://127.0.0.1:5000/update_corpus_report",
                 corpus = emptyCorpus,
                 participants = listOf(otherParty)
         )
@@ -161,6 +163,7 @@ class IssueCorpusFlowTests {
         val futureTwo = a.startFlow(IssueCorpusFlow(
                 algorithmUsed = "Passive Aggressive",
                 classificationURL = "http://127.0.0.1:5000/issue_corpus_report",
+                classificationUpdateURL = "http://127.0.0.1:5000/update_corpus_report",
                 corpus = newCorpus,
                 participants = listOf(otherParty)
         ))
@@ -174,6 +177,7 @@ class IssueCorpusFlowTests {
         val flow = IssueCorpusFlow(
                 algorithmUsed = "Passive Aggressive",
                 classificationURL = "http://127.0.0.1:5000/issue_corpus_report",
+                classificationUpdateURL = "http://127.0.0.1:5000/update_corpus_report",
                 corpus = newCorpus,
                 participants = listOf(otherParty)
         )
@@ -189,6 +193,7 @@ class IssueCorpusFlowTests {
         val flow = IssueCorpusFlow(
                 algorithmUsed = "Passive Aggressive",
                 classificationURL = "http://127.0.0.1:5000/issue_corpus_report",
+                classificationUpdateURL = "http://127.0.0.1:5000/update_corpus_report",
                 corpus = newCorpus,
                 participants = listOf(otherParty)
         )

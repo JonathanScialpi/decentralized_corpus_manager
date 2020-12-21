@@ -92,7 +92,7 @@ class UpdateCorpusResponder(val counterpartySession: FlowSession): FlowLogic<Sig
         val signedTransactionFlow = object : SignTransactionFlow(counterpartySession) {
             override fun checkTransaction(stx: SignedTransaction) = requireThat {
                 val output = stx.tx.outputs.single().data
-                "This must be an Corpus State transaction" using (output is CorpusState)
+                "This must be a Corpus State transaction" using (output is CorpusState)
             }
         }
 

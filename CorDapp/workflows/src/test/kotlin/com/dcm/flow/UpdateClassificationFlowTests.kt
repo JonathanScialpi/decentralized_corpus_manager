@@ -177,6 +177,7 @@ class UpdateClassificationURLFlowTests {
         val flow = IssueCorpusFlow(
                 algorithmUsed = "Passive Aggressive",
                 classificationURL = "http://127.0.0.1:5000/issue_corpus_report",
+                classificationUpdateURL = "http://127.0.0.1:5000/update_corpus_report",
                 corpus = origCorpus,
                 participants = listOf(creator, otherParty)
         )
@@ -185,7 +186,8 @@ class UpdateClassificationURLFlowTests {
 
         val origCorpus = future.getOrThrow().tx.outputs.single().data as CorpusState
         val flowTwo = UpdateClassificationURL(
-                newURL = "www.google.com",
+                classificationURL = "www.google.com",
+                classificationUpdateURL = "http://127.0.0.1:5000/update_corpus_report",
                 corpusLinearId = origCorpus.linearId
         )
         val futureTwo = a.startFlow(flowTwo)
@@ -200,6 +202,7 @@ class UpdateClassificationURLFlowTests {
         val flow = IssueCorpusFlow(
                 algorithmUsed = "Passive Aggressive",
                 classificationURL = "http://127.0.0.1:5000/issue_corpus_report",
+                classificationUpdateURL = "http://127.0.0.1:5000/update_corpus_report",
                 corpus = origCorpus,
                 participants = listOf(creator, otherParty)
         )
@@ -208,7 +211,8 @@ class UpdateClassificationURLFlowTests {
 
         val origCorpus = future.getOrThrow().tx.outputs.single().data as CorpusState
         val flowTwo = UpdateClassificationURL(
-                newURL = "http://127.0.0.1:5000/issue_corpus_report",
+                classificationURL = "http://127.0.0.1:5000/issue_corpus_report",
+                classificationUpdateURL = "http://127.0.0.1:5000/update_corpus_report",
                 corpusLinearId = origCorpus.linearId
         )
         val futureTwo = a.startFlow(flowTwo)
