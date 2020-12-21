@@ -50,7 +50,7 @@ data class CorpusState(
         return copy(classificationURL = newURL)
     }
 
-    fun replaceClassificationURL(newURL : String) : CorpusState{
+    fun replaceClassificationUpdateURL(newURL : String) : CorpusState{
         return copy(classificationUpdateURL = newURL)
     }
 

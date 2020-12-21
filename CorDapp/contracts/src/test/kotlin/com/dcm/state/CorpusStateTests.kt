@@ -65,6 +65,9 @@ class CorpusStateTests {
         CorpusState::class.java.getDeclaredField("classificationURL")
         assertEquals(CorpusState::class.java.getDeclaredField("classificationURL").type, String::class.java)
 
+        CorpusState::class.java.getDeclaredField("classificationUpdateURL")
+        assertEquals(CorpusState::class.java.getDeclaredField("classificationUpdateURL").type, String::class.java)
+
         CorpusState::class.java.getDeclaredField("corpus")
         assertEquals(CorpusState::class.java.getDeclaredField("corpus").type, LinkedHashMap::class.java)
 
@@ -84,6 +87,7 @@ class CorpusStateTests {
                 status = "Open",
                 algorithmUsed = "Passive Aggressive",
                 classificationURL = "http://127.0.0.1:5000/issue_corpus_report",
+                classificationUpdateURL = "http://127.0.0.1:5000/update_corpus_report",
                 corpus = origCorpus,
                 classificationReport = origClassificationReport,
                 owner = ALICE.party,
@@ -99,6 +103,7 @@ class CorpusStateTests {
                 status = "Open",
                 algorithmUsed = "Passive Aggressive",
                 classificationURL = "http://127.0.0.1:5000/issue_corpus_report",
+                classificationUpdateURL = "http://127.0.0.1:5000/update_corpus_report",
                 corpus = origCorpus,
                 classificationReport = origClassificationReport,
                 owner = ALICE.party,
