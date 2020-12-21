@@ -40,6 +40,7 @@ class Controller(rpc: NodeRPCConnection) {
     data class CorpusObj @JsonCreator constructor(
             val algorithmUsed : String,
             val classificationURL : String,
+            val classificationUpdateURL : String,
             val corpus: LinkedHashMap<String, String>,
             val participants : String
     )
@@ -56,6 +57,7 @@ class Controller(rpc: NodeRPCConnection) {
                 ::IssueCorpusFlow,
                 newCorpus.algorithmUsed,
                 newCorpus.classificationURL,
+                newCorpus.classificationUpdateURL,
                 newCorpus.corpus,
                 newCorpus.participants.split(";").map{ proxy.wellKnownPartyFromX500Name(CordaX500Name.parse(it)) as Party}
         )
@@ -63,6 +65,7 @@ class Controller(rpc: NodeRPCConnection) {
         val responseMap = HashMap<String, Any>()
         responseMap["algorithmUsed"] = corpus.algorithmUsed
         responseMap["classificationURL"] = corpus.classificationURL
+        responseMap["classificationUpdateURL"] = corpus.classificationUpdateURL
         responseMap["corpus"] = corpus.corpus
         responseMap["classificationReport"] = corpus.classificationReport
         responseMap["owner"] = corpus.owner.toString()
@@ -92,6 +95,7 @@ class Controller(rpc: NodeRPCConnection) {
         val responseMap = HashMap<String, Any>()
         responseMap["algorithmUsed"] = corpus.algorithmUsed
         responseMap["classificationURL"] = corpus.classificationURL
+        responseMap["classificationUpdateURL"] = corpus.classificationUpdateURL
         responseMap["corpus"] = corpus.corpus
         responseMap["classificationReport"] = corpus.classificationReport
         responseMap["owner"] = corpus.owner.toString()
@@ -101,7 +105,8 @@ class Controller(rpc: NodeRPCConnection) {
     }
 
     data class ClassificationURLObj @JsonCreator constructor(
-            val newURL: String,
+            val newClassificationURL: String,
+            val newClassificationUpdateURL :String,
             val corpusLinearId: String
     )
 
@@ -112,13 +117,15 @@ class Controller(rpc: NodeRPCConnection) {
     private fun updateClassificationEndpoint(@RequestBody updatedURL : ClassificationURLObj): ResponseEntity<String?>{
         val result = proxy.startFlow(
                 ::UpdateClassificationURL,
-                updatedURL.newURL,
+                updatedURL.newClassificationURL,
+                updatedURL.newClassificationUpdateURL,
                 UniqueIdentifier.fromString(updatedURL.corpusLinearId)
         )
         val corpus = result.returnValue.get().tx.outputs[0].data as CorpusState
         val responseMap = HashMap<String, Any>()
         responseMap["algorithmUsed"] = corpus.algorithmUsed
         responseMap["classificationURL"] = corpus.classificationURL
+        responseMap["classificationUpdateURL"] = corpus.classificationUpdateURL
         responseMap["corpus"] = corpus.corpus
         responseMap["classificationReport"] = corpus.classificationReport
         responseMap["owner"] = corpus.owner.toString()
@@ -148,6 +155,7 @@ class Controller(rpc: NodeRPCConnection) {
         val responseMap = HashMap<String, Any>()
         responseMap["algorithmUsed"] = corpus.algorithmUsed
         responseMap["classificationURL"] = corpus.classificationURL
+        responseMap["classificationUpdateURL"] = corpus.classificationUpdateURL
         responseMap["corpus"] = corpus.corpus
         responseMap["classificationReport"] = corpus.classificationReport
         responseMap["owner"] = corpus.owner.toString()
@@ -172,6 +180,7 @@ class Controller(rpc: NodeRPCConnection) {
         val responseMap = HashMap<String, Any>()
         responseMap["algorithmUsed"] = corpus.algorithmUsed
         responseMap["classificationURL"] = corpus.classificationURL
+        responseMap["classificationUpdateURL"] = corpus.classificationUpdateURL
         responseMap["corpus"] = corpus.corpus
         responseMap["classificationReport"] = corpus.classificationReport
         responseMap["owner"] = corpus.owner.toString()
@@ -183,6 +192,7 @@ class Controller(rpc: NodeRPCConnection) {
     data class CSVCorpusObj @JsonCreator constructor(
             val algorithmUsed : String,
             val classificationURL : String,
+            val classificationUpdateURL : String,
             val participants : String
     )
 
@@ -207,6 +217,7 @@ class Controller(rpc: NodeRPCConnection) {
                 ::IssueCorpusFlow,
                 csvCorpusObj.algorithmUsed,
                 csvCorpusObj.classificationURL,
+                csvCorpusObj.classificationUpdateURL,
                 corpus,
                 csvCorpusObj.participants.split(";").map{ proxy.wellKnownPartyFromX500Name(CordaX500Name.parse(it)) as Party}
         )
@@ -215,6 +226,7 @@ class Controller(rpc: NodeRPCConnection) {
         val responseMap = HashMap<String, Any>()
         responseMap["algorithmUsed"] = corpusState.algorithmUsed
         responseMap["classificationURL"] = corpusState.classificationURL
+        responseMap["classificationUpdateURL"] = corpusState.classificationUpdateURL
         responseMap["corpus"] = corpusState.corpus
         responseMap["classificationReport"] = corpusState.classificationReport
         responseMap["owner"] = corpusState.owner.toString()
@@ -232,6 +244,7 @@ class Controller(rpc: NodeRPCConnection) {
         val responseMap = HashMap<String, Any>()
         responseMap["algorithmUsed"] = corpus.algorithmUsed
         responseMap["classificationURL"] = corpus.classificationURL
+        responseMap["classificationUpdateURL"] = corpus.classificationUpdateURL
         responseMap["corpus"] = corpus.corpus
         responseMap["classificationReport"] = corpus.classificationReport
         responseMap["owner"] = corpus.owner.toString()

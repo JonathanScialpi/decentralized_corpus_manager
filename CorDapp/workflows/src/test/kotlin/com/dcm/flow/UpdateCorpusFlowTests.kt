@@ -176,7 +176,8 @@ class UpdateCorpusFlowTests {
         val otherParty = b.info.chooseIdentityAndCert().party
         val flow = IssueCorpusFlow(
                 algorithmUsed = "Passive Aggressive",
-                classificationURL = "http://127.0.0.1:5000/classify",
+                classificationURL = "http://127.0.0.1:5000/issue_corpus_report",
+                classificationUpdateURL = "http://127.0.0.1:5000/update_corpus_report",
                 corpus = origCorpus,
                 participants = listOf(creator, otherParty)
         )
@@ -199,7 +200,8 @@ class UpdateCorpusFlowTests {
         val otherParty = b.info.chooseIdentityAndCert().party
         val flow = IssueCorpusFlow(
                 algorithmUsed = "Passive Aggressive",
-                classificationURL = "http://127.0.0.1:5000/classify",
+                classificationURL = "http://127.0.0.1:5000/issue_corpus_report",
+                classificationUpdateURL = "http://127.0.0.1:5000/update_corpus_report",
                 corpus = newCorpus,
                 participants = listOf(creator, otherParty)
         )

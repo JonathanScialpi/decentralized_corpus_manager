@@ -48,6 +48,7 @@ class CorpusContract: Contract {
                 }
                 "Your change must have a positive affect on the corpus's classification report. Your delta was: $delta" using (delta > 0)
                 "The classification URL cannot change during a corpus update." using (input.classificationURL  == output.classificationURL)
+                "The classification update URL cannot change during a corpus update." using (input.classificationUpdateURL  == output.classificationUpdateURL)
                 "The owner cannot change during a corpus update." using (input.owner.owningKey  == output.owner.owningKey)
                 "The algorithm used cannot change during a corpus update." using (input.algorithmUsed  == output.algorithmUsed)
                 "The owner must be included in the list of signers." using (output.owner.owningKey in command.signers)
@@ -65,6 +66,7 @@ class CorpusContract: Contract {
                 "The current owner and the new owner cannot be the same." using (input.owner.owningKey != output.owner.owningKey)
                 "The algorithm used cannot change during a corpus update." using (input.algorithmUsed == output.algorithmUsed)
                 "The classification URL cannot change during a corpus update." using (input.classificationURL  == output.classificationURL)
+                "The classification update URL cannot change during a corpus update." using (input.classificationUpdateURL  == output.classificationUpdateURL)
                 "The previous owner must be included in the list of signers." using (input.owner.owningKey in command.signers)
                 "The current status must be 'Open'" using (input.status == "Open")
                 "The proposed state status must be 'Open'" using (output.status == "Open")
@@ -79,7 +81,7 @@ class CorpusContract: Contract {
                 "You cannot change the corpus corpus during an endpoint update." using (input.corpus == output.corpus)
                 "You cannot change the classification report while updating the classification endpoint." using (input.classificationReport == output.classificationReport)
                 "You cannot change the owner of a corpus during an endpoint update" using (input.owner.owningKey == output.owner.owningKey)
-                "The classification URL cannot be the same as the input state's." using (input.classificationURL  != output.classificationURL)
+                "The classification or update URL cannot be the same as the input state's." using ((input.classificationURL  != output.classificationURL) || (input.classificationUpdateURL  != output.classificationUpdateURL))
                 "The previous owner must be included in the list of signers." using (input.owner.owningKey in command.signers)
                 "The current status must be 'Open'" using (input.status == "Open")
                 "The proposed state status must be 'Open'" using (output.status == "Open")
@@ -98,6 +100,7 @@ class CorpusContract: Contract {
                 "You cannot change the classification report while updating the classification endpoint." using (input.classificationReport == output.classificationReport)
                 "You cannot change the owner of a corpus during an endpoint update." using (input.owner.owningKey == output.owner.owningKey)
                 "You cannot change the classificationURL." using (input.classificationURL == output.classificationURL)
+                "You cannot change the classificationUpdateURL." using (input.classificationUpdateURL  == output.classificationUpdateURL)
             }
 
             is Commands.CloseCorpus -> requireThat {

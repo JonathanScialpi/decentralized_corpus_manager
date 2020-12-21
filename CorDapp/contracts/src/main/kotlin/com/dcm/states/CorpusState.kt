@@ -35,6 +35,7 @@ data class CorpusState(
         val status: String,
         val algorithmUsed: String,
         val classificationURL : String,
+        val classificationUpdateURL : String,
         val corpus: LinkedHashMap<String, String>,
         val classificationReport: LinkedHashMap<String, LinkedHashMap<String, Double>>,
         val owner: Party,
@@ -47,6 +48,10 @@ data class CorpusState(
 
     fun replaceClassificationURL(newURL : String) : CorpusState{
         return copy(classificationURL = newURL)
+    }
+
+    fun replaceClassificationUpdateURL(newURL : String) : CorpusState{
+        return copy(classificationUpdateURL = newURL)
     }
 
     fun replaceOwner(newOwner: Party) : CorpusState{

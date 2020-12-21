@@ -5,7 +5,7 @@ import {BrowserRouter as Router, Switch, Route} from 'react-router-dom';
 import NavigationBar from './components/NavigationBar';
 import Welcome from './components/Welcome';
 import Footer from './components/Footer';
-import Classify from './components/Classify';
+import Classify from './components/issue_corpus_report';
 
 function App() {
   const marginTop = {
@@ -19,7 +19,7 @@ function App() {
           <Col lg={12} style = {marginTop}>
             <Switch>
               <Route path = "/" exact component = {Welcome} />
-              <Route path = "/classify" exact component = {Classify} />
+              <Route path = "/issue_corpus_report" exact component = {Classify} />
             </Switch>
           </Col>
         </Row>

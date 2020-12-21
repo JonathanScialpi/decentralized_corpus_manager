@@ -15,7 +15,8 @@ import net.corda.core.transactions.TransactionBuilder
 @StartableByRPC
 
 class UpdateClassificationURL (
-        private val newURL: String,
+        private val classificationURL: String,
+        private val classificationUpdateURL: String,
         private val corpusLinearId: UniqueIdentifier
 ): FlowLogic<SignedTransaction>() {
     @Suspendable
@@ -34,7 +35,7 @@ class UpdateClassificationURL (
         }
 
         // finish building tx
-        val outputCorpusState = inputCorpusState.replaceClassificationURL(newURL)
+        val outputCorpusState = inputCorpusState.replaceClassificationURL(classificationURL).replaceClassificationUpdateURL(classificationUpdateURL)
         val commandData = CorpusContract.Commands.UpdateClassifcationEndpoint()
         transactionBuilder.addCommand(commandData, inputCorpusState.participants.map { it.owningKey })
         transactionBuilder.addOutputState(outputCorpusState, CorpusContract.ID)

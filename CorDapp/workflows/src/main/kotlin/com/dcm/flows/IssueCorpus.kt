@@ -22,6 +22,7 @@ import java.io.IOException
 open class IssueCorpusFlow(
         private val algorithmUsed : String,
         private val classificationURL : String,
+        private val classificationUpdateURL : String,
         private val corpus: LinkedHashMap<String, String>,
         private val participants : List<Party>
 ): FlowLogic<SignedTransaction>() {
@@ -44,6 +45,7 @@ open class IssueCorpusFlow(
                 "Open",
                 algorithmUsed,
                 classificationURL,
+                classificationUpdateURL,
                 corpus,
                 classificationReport,
                 ourIdentity,
