@@ -20,15 +20,12 @@ def home():
 
 # @DEV: The main endpoint that produces classification reports for the CorDapp
 # @Param: Corpus is the Hashmanp<String,String> where each key is an utterance and each value is a label
-@app.route("/classify", methods=['POST'])
+@app.route("/issue_corpus_report", methods=['POST'])
 def passive_aggressive_classifier():
 
-    print("test")
-    print(request.json)    
     #loop through csv to build training_data and target_label_array
     training_data = []
     target_label_array = []
-    list_of_goals = []
     for k,v in request.json["corpus"].items():    
         training_data.append(k)
         target_label_array.append(v)
@@ -144,29 +141,27 @@ def pac_with_csv():
     return jsonify(classification_report_output)
 
 #Classifying with proposed corpus
-@app.route("/classify_updated", methods=['POST'])
+@app.route("/update_corpus_report", methods=['POST'])
 def passive_aggressive_proposed_corpus():
-    print("updating")
+    
     #get both the proposed and original corpus
-
-    proposedCorpus = request.json["proposedCorpus"]
     currCorpus = request.json["corpus"]
+    proposedCorpus = request.json["proposedCorpus"]
 
     commonCorpus = {}
-    deletions = {}
     insertions = {}
 
-    for k,v in currCorpus.items():
-        if (k in proposedCorpus.keys()):
+    #find the data rows that are in both corpus sets and the ones that are newly proposed
+    for k,v in proposedCorpus.items():
+        if k in currCorpus.keys():
             commonCorpus[k] = v
         else:
-            deletions[k] = v
-    for k,v in proposedCorpus.items():
-        if (k not in currCorpus.keys()):
             insertions[k] = v
+
     training_data = []
     target_labels = []
 
+    #generate original training set to use as a starting point
     for k,v in commonCorpus.items():
         training_data.append(k)
         target_labels.append(v)
@@ -177,6 +172,7 @@ def passive_aggressive_proposed_corpus():
     X_train, X_test, y_train, y_test = train_test_split(training_data,
     orig_targets, test_size = 0.3, random_state = 42)
 
+    #add in all the newly proposed data rows to ensure that they are used to train the new model
     for k,v in insertions.items():
          X_train.append(k)
          y_train.append(v)
